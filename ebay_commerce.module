@@ -97,6 +97,12 @@ function ebay_commerce_permission() {
 
 /**
  *  Define constants
+ *
+ * I store user data in variables for easy development.
+ * Should be stored in the database and be secured.
+ *
+ * TODO : Store user data in DB and secure user credentials.
+ *
  */
 
   define('EBAY_MODE', variable_get('ebay_settings_mode'));
@@ -175,7 +181,7 @@ function ebay_commerce_error_check($responseDoc){
  * @return
  *   eBay record
  */
-function ebay_commerce_action($action){
+function ebay_commerce_action($action , $xml = NULL){
 
   $request = $action . 'Request';
   $responce = $action . 'Response';
@@ -188,7 +194,10 @@ function ebay_commerce_action($action){
   $requestXmlBody .= '<RequesterCredentials><eBayAuthToken>' . EBAY_USER_TOKEN . '</eBayAuthToken></RequesterCredentials>';
   $requestXmlBody .= '<ErrorLanguage>' . EBAY_ERRORLANGUAGE . '</ErrorLanguage>';
   $requestXmlBody .= '<WarningLevel>' . EBAY_WARNINGLEVEL . '</WarningLevel>';
+  $requestXmlBody .= $xml;
   $requestXmlBody .= '</' . $request . '>';
+
+  dsm($requestXmlBody);
 
   //Create a new eBay session
   $session = new eBaySession(
@@ -230,6 +239,10 @@ function ebay_commerce_action($action){
 /**
  * Get time from the eBay server.
  *
+ * Can alse be used to check for connection with eBay server
+ * before performing any action like uploading a product.
+ * Should only be called once per session because eBay has a connection limit.
+ *
  * @return
  *   Time from eBay server in array.
  *
@@ -257,3 +270,111 @@ function ebay_commerce_get_time(){
     return $ebay_response;
   }
 } // End function
+
+
+/**
+ * Test function for uploading a product as a fixed price item to eBay.
+ * AddFixedPriceItem.
+ * Used for testing and debugging.
+ *
+ * See : http://developer.ebay.com/devzone/xml/docs/reference/ebay/AddFixedPriceItem.html
+ */
+function ebay_commerce_test_upload(){
+
+  // Build some values for testing
+  $inventorytracking = ebay_inventory_tracking_method();
+  $sku = rand();
+  $title = random_title(20);
+  $lorum =  file_get_contents('http://loripsum.net/api'); // Generate dummy from http://loripsum.net/
+  $description = utf8_encode("<![CDATA[ " . $lorum . " ]]>");
+  $ebay_category = '88433';
+  $price = rand(1,1000);
+  $image = 'http://lorempixel.com/400/200/'; //http://dummyimage.com/300.png/09f/fff
+  $country = 'US';
+  $site = EBAY_SITE;
+
+  // Create XMl data for uplaod.
+  $requestXmlBody = "<Item>";
+  $requestXmlBody .= "<InventoryTrackingMethod>$inventorytracking</InventoryTrackingMethod>";
+  $requestXmlBody .= "<SKU>$sku</SKU>";
+  $requestXmlBody .= "<Title>$title</Title>";
+  $requestXmlBody .= "<Description>$description</Description>";
+  $requestXmlBody .= "<PrimaryCategory><CategoryID>$ebay_category</CategoryID></PrimaryCategory>";
+  $requestXmlBody .= "<StartPrice>$price</StartPrice>";
+
+  $requestXmlBody .= "<Country>$country</Country>";
+  $requestXmlBody .= "<Currency>" . EBAY_CURRENCY . "</Currency>";
+  $requestXmlBody .= "<DispatchTimeMax>1</DispatchTimeMax>";
+  $requestXmlBody .= "<ListingDuration>GTC</ListingDuration>";
+  $requestXmlBody .= "<ListingType>FixedPriceItem</ListingType>";
+  $requestXmlBody .= "<PaymentMethods>PayPal</PaymentMethods>";
+  $requestXmlBody .= "<PayPalEmailAddress>" . EBAY_USER_PAYPAL . "</PayPalEmailAddress>";
+  $requestXmlBody .= "<PictureDetails>";
+  $requestXmlBody .= "<PictureURL>$image</PictureURL>";
+  $requestXmlBody .= "</PictureDetails>";
+  $requestXmlBody .= "<PostalCode>95125</PostalCode>";
+  $requestXmlBody .= "<Quantity>1</Quantity>";
+
+  $requestXmlBody .= "<ReturnPolicy><ReturnsAcceptedOption>ReturnsAccepted</ReturnsAcceptedOption>";
+  $requestXmlBody .= "<ReturnsWithinOption>Days_14</ReturnsWithinOption>";
+  $requestXmlBody .= "<Description>If you are not satisfied, return the item for refund.</Description>";
+  $requestXmlBody .= "<ShippingCostPaidByOption>Buyer</ShippingCostPaidByOption>";
+  $requestXmlBody .= "</ReturnPolicy>";
+
+  $requestXmlBody .= "<ShippingDetails>";
+  $requestXmlBody .= "<ShippingType>Flat</ShippingType>";
+  $requestXmlBody .= "<ShippingServiceOptions>";
+  $requestXmlBody .= "<ShippingServicePriority>1</ShippingServicePriority>";
+  $requestXmlBody .= "<ShippingService>UPSGround</ShippingService>";
+  $requestXmlBody .= "<ShippingServiceAdditionalCost currencyID="USD">0.00</ShippingServiceAdditionalCost>";
+  $requestXmlBody .= "<FreeShipping>true</FreeShipping>";
+  $requestXmlBody .= "</ShippingServiceOptions>";
+  $requestXmlBody .= "</ShippingDetails>";
+
+  $requestXmlBody .= "<Site>$site</Site>";
+  $requestXmlBody .= "</Item>";
+
+  // Create and execute uplaod.
+  $record = ebay_commerce_action('AddFixedPriceItem', $requestXmlBody);
+
+}
+
+
+/**
+ *  Check the inventory tracking method.
+ *
+ *  http://developer.ebay.com/DevZone/XML/docs/Reference/eBay/types/InventoryTrackingMethodCodeType.html
+ */
+
+function ebay_inventory_tracking_method(){
+  //How do we track our product on Bay ?
+  if (EBAY_INVENTORY_TRACKING_METHOD == 1){
+      $inventorytracking = "SKU";
+    }
+    else{
+      $inventorytracking = "ItemID";
+    }
+  return $inventorytracking;
+}
+
+/**
+ * Generates a random title for testing only.
+ * Copy code from devel generate module.
+ */
+function random_title($length) {
+   mt_srand((double)microtime()*1000000);
+
+  $vowels = array("a", "e", "i", "o", "u");
+  $cons = array("b", "c", "d", "g", "h", "j", "k", "l", "m", "n", "p", "r", "s", "t", "u", "v", "w", "tr",
+  "cr", "br", "fr", "th", "dr", "ch", "ph", "wr", "st", "sp", "sw", "pr", "sl", "cl", "sh");
+
+  $num_vowels = count($vowels);
+  $num_cons = count($cons);
+  $word = '';
+
+  while(strlen($word) < $length){
+    $word .= $cons[mt_rand(0, $num_cons - 1)] . $vowels[mt_rand(0, $num_vowels - 1)];
+  }
+
+  return substr($word, 0, $length);
+}
