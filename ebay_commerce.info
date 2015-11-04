@@ -1,1 +1,6 @@
 name = eBay commerce
+description = Upload products to ebay.
+package = eBay
+core = 7.x
+
+files[] = includes/lib/eBaySession.inc

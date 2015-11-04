@@ -1,0 +1,233 @@
+<?php
+
+/**
+ * eBay commerce module
+ */
+
+
+/**
+ * Implements hook_menu().
+ */
+
+function ebay_commerce_menu() {
+  $items = array();
+
+  /* Root Menu */
+  $items['admin/ebay'] = array(
+    'title' => 'eBay',
+    'description' => t('eBay main menu.'),
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('administer ebay'),
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+  );
+
+  /* Settings Menu */
+  $items['admin/ebay/settings'] = array(
+    'title' => t('Settings'),
+    'description' => t('Configuration and credentials for eBay.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ebay_commerce_settings_form'),
+    'access arguments' => array('administer ebay'),
+    'file' => 'includes/ui/ebay_commerce_settings.inc',
+    'weight' => 1
+  );
+
+  $items['admin/ebay/settings/common'] = array(
+    'title' => t('Settings'),
+    'description' => t('Settings'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ebay_commerce_settings_form'),
+    'access arguments' => array('administer ebay'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 2
+  );
+
+  $items['admin/ebay/settings/production'] = array(
+    'title' => t('Production'),
+    'description' => t('Change the content of the contact form'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ebay_admin_page_settings_production_form'),
+    'access arguments' => array('administer ebay'),
+    'file' => 'includes/ui/ebay_commerce_settings_production.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3
+  );
+
+  $items['admin/ebay/settings/sandbox'] = array(
+    'title' => t('Sandbox'),
+    'description' => t('Change the content of the contact form'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ebay_admin_page_settings_sandbox_form'),
+    'access arguments' => array('administer ebay'),
+    'file' => 'includes/ui/ebay_commerce_settings_sandbox.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3
+  );
+
+  return $items;
+
+}
+
+
+/**
+ * Implements hook_permission().
+ */
+
+function ebay_commerce_permission() {
+
+  return array(
+    'administer ebay' => array(
+    'title' => t('Administer ebay'),
+    'description' => t('Administer ebay settings'),
+    ),
+
+    'end ebay items' => array(
+    'title' => t('End ebay items'),
+    'description' => t('Allow users to end ebay items'),
+    ),
+
+    'post ebay items' => array(
+    'title' => t('Post ebay items'),
+    'description' => t('Allow users to post ebay items'),
+    ),
+  );
+
+}
+
+/**
+ *  Define constants
+ */
+
+  define('EBAY_MODE', variable_get('ebay_settings_mode'));
+  define('EBAY_API', variable_get('ebay_settings_api'));
+  define('EBAY_SITE', variable_get('ebay_settings_site_id'));
+  define('EBAY_CURRENCY', variable_get('ebay_settings_currency'));
+  define('EBAY_ERRORLANGUAGE', variable_get('ebay_settings_errorlanguage'));
+  define('EBAY_WARNINGLEVEL', variable_get('ebay_settings_warninglevel'));
+  define('EBAY_INVENTORY_TRACKING_METHOD', variable_get('ebay_settings_inventory_tracking_method'));
+  define('EBAY_CONDITION_ID', variable_get('ebay_settings_condition_id'));
+
+  // Check Mode Sandbox Or Production
+  if (EBAY_MODE == 'production') {
+    // production environment
+    define('EBAY_DEVELOPER_ID', variable_get('ebay_admin_production_dev_id'));
+    define('EBAY_APPLICATION_ID', variable_get('ebay_admin_production_app_id'));
+    define('EBAY_CERT_ID', variable_get('ebay_admin_production_cert_id'));
+    define('EBAY_SERVER_URL', variable_get('ebay_admin_production_url'));
+    define('EBAY_USER_TOKEN', variable_get('ebay_admin_production_usertoken'));
+    define('EBAY_USER_PAYPAL', variable_get('ebay_admin_production_paypal_id'));
+  }
+  else {
+  // sandbox (test) environment
+    define('EBAY_DEVELOPER_ID', variable_get('ebay_admin_sandbox_dev_id'));
+    define('EBAY_APPLICATION_ID', variable_get('ebay_admin_sandbox_app_id'));
+    define('EBAY_CERT_ID', variable_get('ebay_admin_sandbox_cert_id'));
+    define('EBAY_SERVER_URL', variable_get('ebay_admin_sandbox_url'));
+    define('EBAY_USER_TOKEN', variable_get('ebay_admin_sandbox_usertoken'));
+    define('EBAY_USER_PAYPAL', variable_get('ebay_admin_sandbox_paypal_id'));
+  }
+
+
+/**
+ * Checks for errors returned by eBay.
+ */
+function ebay_commerce_error_check($responseDoc){
+
+  $errors = $responseDoc->getElementsByTagName('Errors');
+
+  if($errors->length > 0) {
+
+    //Get error code, ShortMesaage and LongMessage
+    $code = $errors->item(0)->getElementsByTagName('ErrorCode');
+    $shortMsg = $errors->item(0)->getElementsByTagName('ShortMessage');
+    $longMsg = $errors->item(0)->getElementsByTagName('LongMessage');
+
+    //Display code and shortmessage
+    $msg  = 'There were errors: <b>'  . $shortMsg->item(0)->nodeValue . '</b></br>';
+    $msg .= 'eBay returned: <b>ErrorCode ' . $code->item(0)->nodeValue . '</b></br>';
+    $msg .= 'eBay returned the following Message: <b>' . $longMsg->item(0)->nodeValue . '</b>';
+
+    drupal_set_message(t($msg), 'error');
+
+    return TRUE;
+  }
+
+}
+
+/**
+ * Creates a call/action to eBay.
+ *
+ * @return
+ *   eBay record
+ */
+function ebay_commerce_action($action){
+
+  $request = $action . 'Request';
+  $responce = $action . 'Response';
+
+  // Build XML data and POST it to eBay
+
+  //Build the request Xml string
+  $requestXmlBody = '<?xml version="1.0" encoding="utf-8"?>';
+  $requestXmlBody .= '<' . $request . ' xmlns="urn:ebay:apis:eBLBaseComponents">';
+  $requestXmlBody .= '<RequesterCredentials><eBayAuthToken>' . EBAY_USER_TOKEN . '</eBayAuthToken></RequesterCredentials>';
+  $requestXmlBody .= '<ErrorLanguage>' . EBAY_ERRORLANGUAGE . '</ErrorLanguage>';
+  $requestXmlBody .= '<WarningLevel>' . EBAY_WARNINGLEVEL . '</WarningLevel>';
+  $requestXmlBody .= '</' . $request . '>';
+
+  //Create a new eBay session
+  $session = new eBaySession(
+    EBAY_USER_TOKEN,
+    EBAY_DEVELOPER_ID,
+    EBAY_APPLICATION_ID,
+    EBAY_CERT_ID,
+    EBAY_SERVER_URL,
+    EBAY_API,
+    EBAY_SITE,
+    $action
+  );
+
+  // send the request and get response
+  $responseXml = $session->sendHttpRequest($requestXmlBody);
+
+  // if no connection possible end request.
+  if(stristr($responseXml, 'HTTP 404') || $responseXml == ''){
+    drupal_set_message(t('Error sending request'), 'error');
+    //die;
+    return;
+  }
+
+  // Xml string is parsed and creates a DOM Document object
+  $responseDoc = new DomDocument();
+  $responseDoc->loadXML($responseXml);
+
+  // Error check
+  $error = ebay_commerce_error_check($responseDoc);
+
+  if(!$error) {
+    $responses = $responseDoc->getElementsByTagName($responce);
+    return $responses;
+  }
+
+} // End function
+
+/**
+ * Get time from the eBay server.
+ */
+function ebay_commerce_get_time(){
+
+  $record = ebay_commerce_action('GeteBayOfficialTime');
+  if($record){
+    foreach ($record as $response) {
+      $variable = $response->getElementsByTagName('Timestamp');
+      $baytime = strtotime($variable->item(0)->nodeValue);
+      $baytime_formatted = format_date($baytime,'custom', 'F j, Y - H:i');
+
+      $ebay_response = new stdClass();
+      $ebay_response->time_raw = $baytime;
+      $ebay_response->time_format = $baytime_formatted;
+    }
+  //dsm($ebay_response);
+  }
+}
