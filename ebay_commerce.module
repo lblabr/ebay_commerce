@@ -131,6 +131,20 @@ function ebay_commerce_permission() {
 
 /**
  * Checks for errors returned by eBay.
+ *
+ * @param $responseDoc
+ *   Data returned by eBay.
+ * @return
+ *   True or Empty
+ *
+ * @code
+ * $error = ebay_commerce_error_check($responseDoc);
+ *  if(!$error) {
+ *    // Code here
+ *  }
+ * @endcode
+ *
+ * See : function ebay_commerce_action()
  */
 function ebay_commerce_error_check($responseDoc){
 
@@ -153,7 +167,7 @@ function ebay_commerce_error_check($responseDoc){
     return TRUE;
   }
 
-}
+} // End function
 
 /**
  * Creates a call/action to eBay.
@@ -212,8 +226,20 @@ function ebay_commerce_action($action){
 
 } // End function
 
+
 /**
  * Get time from the eBay server.
+ *
+ * @return
+ *   Time from eBay server in array.
+ *
+ * @code
+ * $ebay = ebay_commerce_get_time();
+ *  if($time) {
+ *    print $ebay->time_raw;
+ *    print $ebay->time_format;
+ *  }
+ * @endcode
  */
 function ebay_commerce_get_time(){
 
@@ -228,6 +254,6 @@ function ebay_commerce_get_time(){
       $ebay_response->time_raw = $baytime;
       $ebay_response->time_format = $baytime_formatted;
     }
-  //dsm($ebay_response);
+    return $ebay_response;
   }
-}
+} // End function
