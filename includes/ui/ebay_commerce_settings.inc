@@ -54,6 +54,8 @@ function ebay_commerce_settings_form() {
       '848' => t('848'),
       '849' => t('849'),
       '850' => t('850'),
+      '945' => t('945'),
+
     ),
     '#ajax' => array(
       'callback' => 'ebay_admin_settings_ajax_callback_api',

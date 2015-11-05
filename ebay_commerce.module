@@ -326,7 +326,7 @@ function ebay_commerce_test_upload(){
   $requestXmlBody .= "<ShippingServiceOptions>";
   $requestXmlBody .= "<ShippingServicePriority>1</ShippingServicePriority>";
   $requestXmlBody .= "<ShippingService>UPSGround</ShippingService>";
-  $requestXmlBody .= "<ShippingServiceAdditionalCost currencyID="USD">0.00</ShippingServiceAdditionalCost>";
+  $requestXmlBody .= "<ShippingServiceAdditionalCost>0.00</ShippingServiceAdditionalCost>";
   $requestXmlBody .= "<FreeShipping>true</FreeShipping>";
   $requestXmlBody .= "</ShippingServiceOptions>";
   $requestXmlBody .= "</ShippingDetails>";
@@ -378,3 +378,5 @@ function random_title($length) {
 
   return substr($word, 0, $length);
 }
+
+
