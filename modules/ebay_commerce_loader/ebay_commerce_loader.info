@@ -1,0 +1,4 @@
+name = eBay commerce loader
+description = Retrive default values and site information from ebay.
+package = eBay
+core = 7.x

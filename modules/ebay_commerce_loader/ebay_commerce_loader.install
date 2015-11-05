@@ -1,0 +1,39 @@
+<?php
+/**
+ * Implements hook_schema().
+ */
+function ebay_commerce_loader_schema() {
+  $schema = array();
+
+  $schema['ebay_commerce_sites'] = array(
+    'description' => t('The base table for nodes.'),
+    'fields' => array(
+      'ecsid' => array(
+        'description' => 'The primary identifier for a node.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE),
+      'site_id' => array(
+        'description' => 'The current {node_revisions}.vid version identifier.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0),
+      'site' => array(
+        'description' => 'The title of this node, always treated a non-markup plain text.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => ''),
+      ),
+    'indexes' => array(
+      'site' => array('site'),
+      ),
+    'unique keys' => array(
+      'site_id' => array('site_id'),
+      ),
+    'primary key' => array('ecsid'),
+    );
+
+  return $schema;
+}
