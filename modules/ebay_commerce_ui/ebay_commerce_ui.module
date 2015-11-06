@@ -1,0 +1,71 @@
+<?php
+
+/**
+ * @file
+ *
+ * User interface for commerce eBay module.
+ *
+ */
+/**
+ * Implements hook_menu().
+ */
+
+function ebay_commerce_ui_menu() {
+  $items = array();
+
+  /* Root Menu */
+  $items['admin/ebay'] = array(
+    'title' => 'eBay',
+    'description' => t('eBay main menu.'),
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('administer ebay'),
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+  );
+
+  /* Settings Menu */
+  $items['admin/ebay/settings'] = array(
+    'title' => t('Settings'),
+    'description' => t('Configuration and credentials for eBay.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ebay_commerce_settings_form'),
+    'access arguments' => array('administer ebay'),
+    'file' => 'includes/ebay_commerce_settings.inc',
+    'weight' => 1
+  );
+
+  $items['admin/ebay/settings/common'] = array(
+    'title' => t('Settings'),
+    'description' => t('Settings'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ebay_commerce_settings_form'),
+    'access arguments' => array('administer ebay'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 2
+  );
+
+  $items['admin/ebay/settings/production'] = array(
+    'title' => t('Production'),
+    'description' => t('Change the content of the contact form'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ebay_admin_page_settings_production_form'),
+    'access arguments' => array('administer ebay'),
+    'file' => 'includes/ebay_commerce_settings_production.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3
+  );
+
+  $items['admin/ebay/settings/sandbox'] = array(
+    'title' => t('Sandbox'),
+    'description' => t('Change the content of the contact form'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ebay_admin_page_settings_sandbox_form'),
+    'access arguments' => array('administer ebay'),
+    'file' => 'includes/ebay_commerce_settings_sandbox.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 3
+  );
+
+  return $items;
+
+}
