@@ -47,12 +47,48 @@ class eBayCommerceUITestCase extends DrupalWebTestCase {
   public function setUp() {
     // We call parent::setUp() with the list of modules we want to enable.
     // This can be an array or just a list of arguments.
-    parent::setUp('ebay_commerce');
+    parent::setUp('ebay_commerce', 'ebay_commerce_ui', 'ebay_commerce_loader');
     // Create and log in our user. The user has the arbitrary privilege
     // 'extra special edit any simpletest_example' which is provided by
     // our module to grant access.
     $this->privilegedUser = $this->drupalCreateUser(array('administer ebay'));
     $this->drupalLogin($this->privilegedUser);
   }
+
+  /**
+   * See if our user is unauthorized.
+   */
+  public function testeBayCommerceUIEdit() {
+
+    // We'll run this test normally, but not on the testbot, as it would
+    // indicate that the examples module was failing tests.
+    if (!$this->runningOnTestbot()) {
+      // The debug() statement will output information into the test results.
+      // It can also be used in Drupal 7 anywhere in code and will come out
+      // as a drupal_set_message().
+      debug('We are not running on the PIFR testing server, so will go ahead and catch the failure.');
+      $this->drupalGet("admin/ebay");
+      // Make sure we don't get a 401 unauthorized response:
+      $this->assertResponse(200, 'User is allowed to edit the content.');
+
+    }
+  }
+
+  /**
+   * Detect if we're running on PIFR testbot.
+   *
+   * Skip intentional failure in that case. It happens that on the testbot the
+   * site under test is in a directory named 'checkout' or 'site_under_test'.
+   *
+   * @return bool
+   *   TRUE if running on testbot.
+   */
+  public function runningOnTestbot() {
+    // @todo: Add this line back once the testbot variable is available.
+    // https://www.drupal.org/node/2565181
+    // return env('DRUPALCI');
+    return TRUE;
+  }
+
 
 }

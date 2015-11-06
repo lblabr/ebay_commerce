@@ -16,7 +16,7 @@ function ebay_commerce_ui_menu() {
   /* Root Menu */
   $items['admin/ebay'] = array(
     'title' => 'eBay',
-    'description' => t('eBay main menu.'),
+    'description' => 'eBay main menu.',
     'page callback' => 'system_admin_menu_block_page',
     'access arguments' => array('administer ebay'),
     'file path' => drupal_get_path('module', 'system'),
@@ -25,8 +25,8 @@ function ebay_commerce_ui_menu() {
 
   /* Settings Menu */
   $items['admin/ebay/settings'] = array(
-    'title' => t('Settings'),
-    'description' => t('Configuration and credentials for eBay.'),
+    'title' => 'Settings',
+    'description' => 'Configuration and credentials for eBay.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ebay_commerce_settings_form'),
     'access arguments' => array('administer ebay'),
@@ -35,8 +35,8 @@ function ebay_commerce_ui_menu() {
   );
 
   $items['admin/ebay/settings/common'] = array(
-    'title' => t('Settings'),
-    'description' => t('Settings'),
+    'title' => 'Settings',
+    'description' => 'Settings',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ebay_commerce_settings_form'),
     'access arguments' => array('administer ebay'),
@@ -45,8 +45,8 @@ function ebay_commerce_ui_menu() {
   );
 
   $items['admin/ebay/settings/production'] = array(
-    'title' => t('Production'),
-    'description' => t('Change the content of the contact form'),
+    'title' => 'Production',
+    'description' => 'Change the content of the contact form',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ebay_admin_page_settings_production_form'),
     'access arguments' => array('administer ebay'),
@@ -56,8 +56,8 @@ function ebay_commerce_ui_menu() {
   );
 
   $items['admin/ebay/settings/sandbox'] = array(
-    'title' => t('Sandbox'),
-    'description' => t('Change the content of the contact form'),
+    'title' => 'Sandbox',
+    'description' => 'Change the content of the contact form',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ebay_admin_page_settings_sandbox_form'),
     'access arguments' => array('administer ebay'),

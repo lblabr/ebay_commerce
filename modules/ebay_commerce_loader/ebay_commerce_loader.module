@@ -23,12 +23,12 @@
  *
  */
 
-function ebay_commerce_get_sites(){
+function ebay_commerce_get_sites() {
 
-  $requestXmlBody = '<DetailName>SiteDetails</DetailName>';
-  $record = ebay_commerce_action('GeteBayDetails', $requestXmlBody);
+  $xml_body = '<DetailName>SiteDetails</DetailName>';
+  $record = ebay_commerce_action('GeteBayDetails', $xml_body);
 
-  if($record){
+  if ($record) {
     foreach ($record as $value) {
       $responses = $value->getElementsByTagName('SiteDetails');
 
@@ -65,12 +65,12 @@ function ebay_commerce_get_sites(){
  *
  */
 
-function ebay_commerce_get_country(){
+function ebay_commerce_get_country() {
 
-  $requestXmlBody = '<DetailName>CountryDetails</DetailName>';
-  $record = ebay_commerce_action('GeteBayDetails', $requestXmlBody);
+  $xml_body = '<DetailName>CountryDetails</DetailName>';
+  $record = ebay_commerce_action('GeteBayDetails', $xml_body);
 
-  if($record){
+  if ($record) {
     foreach ($record as $value) {
       $responses = $value->getElementsByTagName('CountryDetails');
 
@@ -106,12 +106,12 @@ function ebay_commerce_get_country(){
  *
  */
 
-function ebay_commerce_get_currency(){
+function ebay_commerce_get_currency() {
 
-  $requestXmlBody = '<DetailName>CurrencyDetails</DetailName>';
-  $record = ebay_commerce_action('GeteBayDetails', $requestXmlBody);
+  $xml_body = '<DetailName>CurrencyDetails</DetailName>';
+  $record = ebay_commerce_action('GeteBayDetails', $xml_body);
 
-  if($record){
+  if ($record) {
     foreach ($record as $value) {
       $responses = $value->getElementsByTagName('CurrencyDetails');
 
@@ -149,12 +149,12 @@ function ebay_commerce_get_currency(){
  *
  */
 
-function ebay_commerce_get_url(){
+function ebay_commerce_get_url() {
 
-  $requestXmlBody = '<DetailName>URLDetails</DetailName>';
-  $record = ebay_commerce_action('GeteBayDetails', $requestXmlBody);
+  $xml_body = '<DetailName>URLDetails</DetailName>';
+  $record = ebay_commerce_action('GeteBayDetails', $xml_body);
 
-  if($record){
+  if ($record) {
     foreach ($record as $value) {
       $responses = $value->getElementsByTagName('URLDetails');
 
@@ -192,7 +192,8 @@ function ebay_commerce_save_site() {
      ->fields((array)$values[$key]);
 
     try{ $query->execute(); }
-    catch(Exception $e){ drupal_set_message( $e->getMessage()); }
+    catch (Exception $e) {
+      drupal_set_message( $e->getMessage()); }
   }
 
 }
@@ -212,7 +213,8 @@ function ebay_commerce_save_country() {
      ->fields((array)$values[$key]);
 
     try{ $query->execute(); }
-    catch(Exception $e){ drupal_set_message( $e->getMessage()); }
+    catch (Exception $e) {
+      drupal_set_message( $e->getMessage()); }
   }
 
 }
@@ -233,7 +235,8 @@ function ebay_commerce_save_currency() {
      ->fields((array)$values[$key]);
 
     try{ $query->execute(); }
-    catch(Exception $e){ drupal_set_message( $e->getMessage()); }
+    catch (Exception $e) {
+      drupal_set_message( $e->getMessage()); }
   }
 
 }
@@ -254,7 +257,8 @@ function ebay_commerce_save_url() {
      ->fields((array)$values[$key]);
 
     try{ $query->execute(); }
-    catch(Exception $e){ drupal_set_message( $e->getMessage()); }
+    catch (Exception $e) {
+      drupal_set_message( $e->getMessage()); }
   }
 
 }
@@ -272,7 +276,7 @@ function ebay_commerce_save_url() {
  *
  */
 
-function ebay_commerce_save_values(){
+function ebay_commerce_save_values() {
   ebay_commerce_save_site();
   ebay_commerce_save_country();
   ebay_commerce_save_currency();
@@ -290,9 +294,9 @@ function ebay_commerce_save_values(){
  * @endcode
  *
  */
-function ebay_commerce_load_site(){
+function ebay_commerce_load_site() {
   $query=db_select('ebay_commerce_sites', 'a')
-   ->fields('a',array('site_id', 'name'));
+   ->fields('a', array('site_id', 'name'));
   $result= $query->execute();
   return $result;
 }
@@ -308,9 +312,9 @@ function ebay_commerce_load_site(){
  * @endcode
  *
  */
-function ebay_commerce_load_country(){
+function ebay_commerce_load_country() {
   $query=db_select('ebay_commerce_country', 'a')
-   ->fields('a',array('country_code', 'name'));
+   ->fields('a', array('country_code', 'name'));
   $result= $query->execute();
   return $result;
 }
@@ -327,9 +331,9 @@ function ebay_commerce_load_country(){
  * @endcode
  *
  */
-function ebay_commerce_load_currency(){
+function ebay_commerce_load_currency() {
   $query=db_select('ebay_commerce_currency', 'a')
-   ->fields('a',array('currency_code', 'name'));
+   ->fields('a', array('currency_code', 'name'));
   $result= $query->execute();
   return $result;
 }
@@ -345,9 +349,9 @@ function ebay_commerce_load_currency(){
  * @endcode
  *
  */
-function ebay_commerce_load_url(){
+function ebay_commerce_load_url() {
   $query=db_select('ebay_commerce_url', 'a')
-   ->fields('a',array('url_type', 'url'));
+   ->fields('a', array('url_type', 'url'));
   $result= $query->execute();
   return $result;
 }

@@ -22,16 +22,16 @@ function ebay_commerce_settings_form() {
   /* FIRST FIELDSET. */
   $form['first'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Basic'),
+    '#title' => 'Basic',
     '#collapsible' => TRUE,
-    '#description' => t(''),
+    '#description' => '',
     '#group' => 'settingsform'
   );
 
   // Select eBay Mode Sandbox or Production.
   $form['first']['ebay_settings_mode'] = array(
     '#type' => 'select',
-    '#title' => t('Ebay Mode'),
+    '#title' => 'Ebay Mode',
     '#default_value' => variable_get('ebay_settings_mode'),
     '#options' => array(
       'production' => t('Production'),
@@ -45,7 +45,7 @@ function ebay_commerce_settings_form() {
   // Select eBay API version
   $form['first']['ebay_settings_api'] = array(
     '#type' => 'select',
-    '#title' => t('API version'),
+    '#title' => 'API version',
     '#default_value' => variable_get('ebay_settings_api'),
     '#options' => array(
       '841' => t('841'),
@@ -65,7 +65,7 @@ function ebay_commerce_settings_form() {
   // Select Site ID
   $form['first']['ebay_settings_site_id'] = array(
     '#type' => 'select',
-    '#title' => t('Default Site ID'),
+    '#title' => 'Default Site ID',
     '#description' => 'The eBay site you want to upload to.',
     '#default_value' => variable_get('ebay_settings_site_id'),
     '#options' => ebay_commerce_select_site(),
@@ -77,7 +77,7 @@ function ebay_commerce_settings_form() {
   // Select Default Currency Settings
   $form['first']['ebay_settings_currency'] = array(
   '#type' => 'select',
-  '#title' => t('Default currency'),
+  '#title' => 'Default currency',
   '#description' => 'The currency should match the site.',
   '#default_value' => variable_get('ebay_settings_currency'),
   '#options' => ebay_commerce_select_currency(),
@@ -89,7 +89,7 @@ function ebay_commerce_settings_form() {
   // Select Country
   $form['first']['ebay_settings_country'] = array(
     '#type' => 'select',
-    '#title' => t('Your country'),
+    '#title' => 'Your country',
     '#description' => 'The country your operating from.',
     '#default_value' => variable_get('ebay_settings_country'),
     '#options' => ebay_commerce_select_country(),
@@ -102,7 +102,7 @@ function ebay_commerce_settings_form() {
   // Select Error Language
   $form['first']['ebay_settings_errorlanguage'] = array(
     '#type' => 'select',
-    '#title' => t('ErrorLanguage'),
+    '#title' => 'ErrorLanguage',
     '#default_value' => variable_get('ebay_settings_errorlanguage'),
     '#options' => array(
       'en_US' => t('en_US'),
@@ -116,7 +116,7 @@ function ebay_commerce_settings_form() {
   // Select warninglevel
   $form['first']['ebay_settings_warninglevel'] = array(
     '#type' => 'select',
-    '#title' => t('WarningLevel'),
+    '#title' => 'WarningLevel',
     '#default_value' => variable_get('ebay_settings_warninglevel'),
     '#options' => array(
       'High' => t('High'),
@@ -130,7 +130,7 @@ function ebay_commerce_settings_form() {
   // Select InventoryTrackingMethod
   $form['first']['ebay_settings_inventory_tracking'] = array(
     '#type' => 'select',
-    '#title' => t('Inventory Tracking'),
+    '#title' => 'Inventory Tracking',
     '#default_value' => variable_get('ebay_settings_inventory_tracking'),
     '#options' => array(
     'ItemID' => t('eBay-objectnumber'),
@@ -144,7 +144,7 @@ function ebay_commerce_settings_form() {
   // Select Condition
   $form['first']['ebay_settings_condition_id'] = array(
   '#type' => 'select',
-  '#title' => t('Condition'),
+  '#title' =>('Condition',
   '#default_value' => variable_get('ebay_settings_condition_id'),
   '#options' => array(
     '1000' => t('New'),
@@ -209,8 +209,7 @@ function ebay_admin_settings_ajax_callback_site_id($form, $form_state) {
  */
 
 function ebay_admin_settings_ajax_callback_currency($form, $form_state) {
-  $variable =  strtoupper($form_state['values']['ebay_settings_currency']);
-  variable_set('ebay_settings_currency', $variable);
+  variable_set('ebay_settings_currency', $form_state['values']['ebay_settings_currency']);
 }
 
 /**
@@ -218,8 +217,7 @@ function ebay_admin_settings_ajax_callback_currency($form, $form_state) {
  */
 
 function ebay_admin_settings_ajax_callback_country($form, $form_state) {
-  $variable =  strtoupper($form_state['values']['ebay_settings_country']);
-  variable_set('ebay_settings_country', $variable);
+  variable_set('ebay_settings_country',$form_state['values']['ebay_settings_country']);
 }
 
 
@@ -280,7 +278,7 @@ function ebay_commerce_select_currency(){
   $result = ebay_commerce_load_currency();
   $options = array();
     foreach ($result as $key => $record) {
-      $options[$record->currency_code] = $record->name;
+      $options[strtoupper($record->currency_code)] = $record->name;
     }
   asort($options);
   return $options;
@@ -295,7 +293,7 @@ function ebay_commerce_select_country(){
   $result = ebay_commerce_load_country();
   $options = array();
     foreach ($result as $key => $record) {
-      $options[$record->country_code] = $record->name;
+      $options[strtoupper($record->country_code)] = $record->name;
     }
   asort($options);
   return $options;
