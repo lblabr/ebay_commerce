@@ -13,9 +13,17 @@
  * Connect to eBay and retrieves the current list of
  * eBay sites and their Site ID values.
  *
+ * http://developer.ebay.com/DevZone/XML/docs/Reference/eBay/extra/GtByDtls.Rqst.DtlNm.html
+ * @code
+ * $result = ebay_commerce_get_sites();
+ *   foreach ($result as $record) {
+ *     dsm($record);
+ *   }
+ * @endcode
+ *
  */
 
-function ebay_commerce_load_sites_ebay(){
+function ebay_commerce_get_sites(){
 
   $requestXmlBody = '<DetailName>SiteDetails</DetailName>';
   $record = ebay_commerce_action('GeteBayDetails', $requestXmlBody);
@@ -26,15 +34,57 @@ function ebay_commerce_load_sites_ebay(){
 
         foreach ($responses as $response) {
 
-          $variable = $response->getElementsByTagName('Site');
-          $site = $variable->item(0)->nodeValue;
-
           $variable = $response->getElementsByTagName('SiteID');
-          $site_id = $variable->item(0)->nodeValue;
+          $identifier = strtolower($variable->item(0)->nodeValue);
 
-          $ebay[$site_id] = array(
-            'site' => $site,
-            'site_id' => $site_id,
+          $variable = $response->getElementsByTagName('Site');
+          $name = $variable->item(0)->nodeValue;
+
+          $ebay[$identifier] = array(
+            'site_id' => $identifier,
+            'name' => $name,
+          );
+        }
+    }
+   return $ebay;
+  }
+}
+
+
+/**
+ * Connect to eBay and retrieves the current list of
+ * eBay Country.
+ *
+ * http://developer.ebay.com/DevZone/XML/docs/Reference/eBay/extra/GtByDtls.Rqst.DtlNm.html
+ * @code
+ * $result = ebay_commerce_get_country();
+ *   foreach ($result as $record) {
+ *     dsm($record);
+ *   }
+ * @endcode
+ *
+ */
+
+function ebay_commerce_get_country(){
+
+  $requestXmlBody = '<DetailName>CountryDetails</DetailName>';
+  $record = ebay_commerce_action('GeteBayDetails', $requestXmlBody);
+
+  if($record){
+    foreach ($record as $value) {
+      $responses = $value->getElementsByTagName('CountryDetails');
+
+        foreach ($responses as $response) {
+
+          $variable = $response->getElementsByTagName('Country');
+          $identifier = strtolower($variable->item(0)->nodeValue);
+
+          $variable = $response->getElementsByTagName('Description');
+          $name = $variable->item(0)->nodeValue;
+
+          $ebay[strtolower($identifier)] = array(
+            'country_code' => $identifier,
+            'name' => $name,
           );
         }
     }
@@ -43,12 +93,97 @@ function ebay_commerce_load_sites_ebay(){
 }
 
 /**
+ * Connect to eBay and retrieves the current list of
+ * eBay CurrencyDetails.
+ *
+ * http://developer.ebay.com/DevZone/XML/docs/Reference/eBay/extra/GtByDtls.Rqst.DtlNm.html
+ * @code
+ * $result = ebay_commerce_get_currency();
+ *   foreach ($result as $record) {
+ *     dsm($record);
+ *   }
+ * @endcode
+ *
+ */
+
+function ebay_commerce_get_currency(){
+
+  $requestXmlBody = '<DetailName>CurrencyDetails</DetailName>';
+  $record = ebay_commerce_action('GeteBayDetails', $requestXmlBody);
+
+  if($record){
+    foreach ($record as $value) {
+      $responses = $value->getElementsByTagName('CurrencyDetails');
+
+        foreach ($responses as $response) {
+
+          $variable = $response->getElementsByTagName('Currency');
+          $identifier = strtolower($variable->item(0)->nodeValue);
+
+          $variable = $response->getElementsByTagName('Description');
+          $name = $variable->item(0)->nodeValue;
+
+          $ebay[$identifier] = array(
+            'currency_code' => $identifier,
+            'name' => $name,
+          );
+        }
+    }
+   return $ebay;
+  }
+}
+
+
+
+/**
+ * Connect to eBay and retrieves the current list of
+ * eBay CurrencyDetails.
+ *
+ * http://developer.ebay.com/DevZone/XML/docs/Reference/eBay/extra/GtByDtls.Rqst.DtlNm.html
+ * @code
+ * $result = ebay_commerce_get_url();
+ *   foreach ($result as $record) {
+ *     dsm($record);
+ *   }
+ * @endcode
+ *
+ */
+
+function ebay_commerce_get_url(){
+
+  $requestXmlBody = '<DetailName>URLDetails</DetailName>';
+  $record = ebay_commerce_action('GeteBayDetails', $requestXmlBody);
+
+  if($record){
+    foreach ($record as $value) {
+      $responses = $value->getElementsByTagName('URLDetails');
+
+        foreach ($responses as $response) {
+
+          $variable = $response->getElementsByTagName('URLType');
+          $identifier = strtolower($variable->item(0)->nodeValue);
+
+          $variable = $response->getElementsByTagName('URL');
+          $name = $variable->item(0)->nodeValue;
+
+          $ebay[$identifier] = array(
+            'url_type' => $identifier,
+            'url' => $name,
+          );
+        }
+    }
+   return $ebay;
+  }
+}
+
+
+/**
  * Insert eBay site information in the database.
  * Table : ebay_commerce_sites.
  */
-function ebay_commerce_save_sites_db() {
+function ebay_commerce_save_site() {
 
-  $values = ebay_commerce_load_sites_ebay();
+  $values = ebay_commerce_get_sites();
 
   foreach ($values as $key => $value) {
 
@@ -63,21 +198,156 @@ function ebay_commerce_save_sites_db() {
 }
 
 /**
- * Load ebay sites from the database.
+ * Insert eBay country information in the database.
+ * Table : ebay_commerce_country.
+ */
+function ebay_commerce_save_country() {
+
+  $values = ebay_commerce_get_country();
+
+  foreach ($values as $key => $value) {
+
+    $query = db_merge('ebay_commerce_country')
+     ->key(array('country_code' => $values[$key]['country_code']))
+     ->fields((array)$values[$key]);
+
+    try{ $query->execute(); }
+    catch(Exception $e){ drupal_set_message( $e->getMessage()); }
+  }
+
+}
+
+
+/**
+ * Insert eBay currency information in the database.
+ * Table : ebay_commerce_currency.
+ */
+function ebay_commerce_save_currency() {
+
+  $values = ebay_commerce_get_currency();
+
+  foreach ($values as $key => $value) {
+
+    $query = db_merge('ebay_commerce_currency')
+     ->key(array('currency_code' => $values[$key]['currency_code']))
+     ->fields((array)$values[$key]);
+
+    try{ $query->execute(); }
+    catch(Exception $e){ drupal_set_message( $e->getMessage()); }
+  }
+
+}
+
+
+/**
+ * Insert eBay currency information in the database.
+ * Table : ebay_commerce_url.
+ */
+function ebay_commerce_save_url() {
+
+  $values = ebay_commerce_get_url();
+
+  foreach ($values as $key => $value) {
+
+    $query = db_merge('ebay_commerce_url')
+     ->key(array('url_type' => $values[$key]['url_type']))
+     ->fields((array)$values[$key]);
+
+    try{ $query->execute(); }
+    catch(Exception $e){ drupal_set_message( $e->getMessage()); }
+  }
+
+}
+
+
+/**
+ * Execute all save functions.
  *
  * @code
- * $result = ebay_commerce_load_sites_db();
+ * $result = ebay_commerce_save_values();
  *   foreach ($result as $record) {
  *     dsm($record);
  *   }
  * @endcode
  *
  */
-function ebay_commerce_load_sites_db(){
 
+function ebay_commerce_save_values(){
+  ebay_commerce_save_site();
+  ebay_commerce_save_country();
+  ebay_commerce_save_currency();
+  ebay_commerce_save_url();
+}
+
+/**
+ * Load ebay sites from the database.
+ *
+ * @code
+ * $result = ebay_commerce_load_site();
+ *   foreach ($result as $record) {
+ *     dsm($record);
+ *   }
+ * @endcode
+ *
+ */
+function ebay_commerce_load_site(){
   $query=db_select('ebay_commerce_sites', 'a')
-   ->fields('a',array('site_id', 'site'));
+   ->fields('a',array('site_id', 'name'));
   $result= $query->execute();
   return $result;
+}
 
+/**
+ * Load ebay country from the database.
+ *
+ * @code
+ * $result = ebay_commerce_load_country();
+ *   foreach ($result as $record) {
+ *     dsm($record);
+ *   }
+ * @endcode
+ *
+ */
+function ebay_commerce_load_country(){
+  $query=db_select('ebay_commerce_country', 'a')
+   ->fields('a',array('country_code', 'name'));
+  $result= $query->execute();
+  return $result;
+}
+
+
+/**
+ * Load ebay currency from the database.
+ *
+ * @code
+ * $result = ebay_commerce_load_currency();
+ *   foreach ($result as $record) {
+ *     dsm($record);
+ *   }
+ * @endcode
+ *
+ */
+function ebay_commerce_load_currency(){
+  $query=db_select('ebay_commerce_currency', 'a')
+   ->fields('a',array('currency_code', 'name'));
+  $result= $query->execute();
+  return $result;
+}
+
+/**
+ * Load ebay url from the database.
+ *
+ * @code
+ * $result = ebay_commerce_load_url();
+ *   foreach ($result as $record) {
+ *     dsm($record);
+ *   }
+ * @endcode
+ *
+ */
+function ebay_commerce_load_url(){
+  $query=db_select('ebay_commerce_url', 'a')
+   ->fields('a',array('url_type', 'url'));
+  $result= $query->execute();
+  return $result;
 }
