@@ -209,7 +209,8 @@ function ebay_admin_settings_ajax_callback_site_id($form, $form_state) {
  */
 
 function ebay_admin_settings_ajax_callback_currency($form, $form_state) {
-  variable_set('ebay_settings_currency', $form_state['values']['ebay_settings_currency']);
+  $variable =  strtoupper($form_state['values']['ebay_settings_currency']);
+  variable_set('ebay_settings_currency', $variable);
 }
 
 /**
@@ -217,7 +218,8 @@ function ebay_admin_settings_ajax_callback_currency($form, $form_state) {
  */
 
 function ebay_admin_settings_ajax_callback_country($form, $form_state) {
-  variable_set('ebay_settings_country', strtoupper($form_state['values']['ebay_settings_country']));
+  $variable =  strtoupper($form_state['values']['ebay_settings_country']);
+  variable_set('ebay_settings_country', $variable);
 }
 
 
