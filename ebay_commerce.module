@@ -101,10 +101,13 @@ function ebay_commerce_error_check($responseDoc){
     $shortMsg = $errors->item(0)->getElementsByTagName('ShortMessage');
     $longMsg = $errors->item(0)->getElementsByTagName('LongMessage');
 
+    $url = 'http://developer.ebay.com/devzone/xml/docs/reference/ebay/errors/errormessages.htm';
+
     //Display code and shortmessage
     $msg  = 'There were errors: <b>'  . $shortMsg->item(0)->nodeValue . '</b></br>';
     $msg .= 'eBay returned: <b>ErrorCode ' . $code->item(0)->nodeValue . '</b></br>';
-    $msg .= 'eBay returned the following Message: <b>' . $longMsg->item(0)->nodeValue . '</b>';
+    $msg .= 'eBay returned the following Message: <b>' . $longMsg->item(0)->nodeValue . '</b></br>';
+    $msg .= '<a href=' . $url .' target="_blank">See error numbers</a>';
 
     drupal_set_message(t($msg), 'error');
 
@@ -266,7 +269,7 @@ function ebay_commerce_test_upload(){
   $requestXmlBody .= "</ShippingServiceOptions>";
   $requestXmlBody .= "</ShippingDetails>";
 
-  $requestXmlBody .= "<Site>" . EBAY_SITE . "</Site>";
+  $requestXmlBody .= "<Site>" . EBAY_COUNTRY . "</Site>";
   $requestXmlBody .= "</Item>";
 
   // Create and execute uplaod.
