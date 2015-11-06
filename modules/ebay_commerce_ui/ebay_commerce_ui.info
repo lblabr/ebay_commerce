@@ -2,3 +2,6 @@ name = eBay commerce ui
 description = User interface for commerce eBay module.
 package = eBay
 core = 7.x
+
+; Simple tests
+files[] = test/ebay_commerce_ui.test

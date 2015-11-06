@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * @file
+ * Simpletest for eBay commerce module.
+ * http://drupal.org/node/890654.
+ */
+
+/**
+ *
+ * @see DrupalWebTestCase
+ * @see SimpleTestUnitTestExampleTestCase
+ *
+ * @ingroup ebay_commerce
+ */
+class eBayCommerceTestCase extends DrupalWebTestCase {
+
+  protected $privilegedUser;
+
+  /**
+   * Give display information to the SimpleTest system.
+   *
+   * getInfo() returns a keyed array of information for SimpleTest to show.
+   *
+   * It's a good idea to organize your tests consistently using the 'group'
+   * key.
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'eBay Commerce core',
+      'description' => 'Ensure that eBay commerce functions properly.',
+      'group' => 'eBay Commerce',
+    );
+  }
+
+  /**
+   * Set up the test environment.
+   *
+   * This method is called once per test method, before the test is executed.
+   * It gives you a chance to control the setup of the test environment.
+   *
+   * If you need a different test environment, then you should create another
+   * test class which overloads DrupalWebTestCase::setUp() differently.
+   *
+   * @see DrupalWebTestCase::setUp()
+   */
+  public function setUp() {
+    // We call parent::setUp() with the list of modules we want to enable.
+    // This can be an array or just a list of arguments.
+    parent::setUp('ebay_commerce');
+    // Create and log in our user. The user has the arbitrary privilege
+    // 'extra special edit any simpletest_example' which is provided by
+    // our module to grant access.
+    $this->privilegedUser = $this->drupalCreateUser(array('administer ebay', 'end ebay items', 'post ebay items'));
+    $this->drupalLogin($this->privilegedUser);
+  }
+
+}

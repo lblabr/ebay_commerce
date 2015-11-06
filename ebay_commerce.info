@@ -3,4 +3,8 @@ description = Upload products to ebay.
 package = eBay
 core = 7.x
 
+; Module includes
 files[] = includes/lib/eBaySession.inc
+
+; Simple tests
+files[] = test/ebay_commerce.test
