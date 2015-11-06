@@ -5,70 +5,6 @@
  */
 
 
-/**
- * Implements hook_menu().
- */
-
-function ebay_commerce_menu() {
-  $items = array();
-
-  /* Root Menu */
-  $items['admin/ebay'] = array(
-    'title' => 'eBay',
-    'description' => t('eBay main menu.'),
-    'page callback' => 'system_admin_menu_block_page',
-    'access arguments' => array('administer ebay'),
-    'file path' => drupal_get_path('module', 'system'),
-    'file' => 'system.admin.inc',
-  );
-
-  /* Settings Menu */
-  $items['admin/ebay/settings'] = array(
-    'title' => t('Settings'),
-    'description' => t('Configuration and credentials for eBay.'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('ebay_commerce_settings_form'),
-    'access arguments' => array('administer ebay'),
-    'file' => 'includes/ui/ebay_commerce_settings.inc',
-    'weight' => 1
-  );
-
-  $items['admin/ebay/settings/common'] = array(
-    'title' => t('Settings'),
-    'description' => t('Settings'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('ebay_commerce_settings_form'),
-    'access arguments' => array('administer ebay'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => 2
-  );
-
-  $items['admin/ebay/settings/production'] = array(
-    'title' => t('Production'),
-    'description' => t('Change the content of the contact form'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('ebay_admin_page_settings_production_form'),
-    'access arguments' => array('administer ebay'),
-    'file' => 'includes/ui/ebay_commerce_settings_production.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 3
-  );
-
-  $items['admin/ebay/settings/sandbox'] = array(
-    'title' => t('Sandbox'),
-    'description' => t('Change the content of the contact form'),
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('ebay_admin_page_settings_sandbox_form'),
-    'access arguments' => array('administer ebay'),
-    'file' => 'includes/ui/ebay_commerce_settings_sandbox.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 3
-  );
-
-  return $items;
-
-}
-
 
 /**
  * Implements hook_permission().
@@ -95,6 +31,7 @@ function ebay_commerce_permission() {
 
 }
 
+
 /**
  *  Define constants
  *
@@ -109,10 +46,11 @@ function ebay_commerce_permission() {
   define('EBAY_API', variable_get('ebay_settings_api'));
   define('EBAY_SITE', variable_get('ebay_settings_site_id'));
   define('EBAY_CURRENCY', variable_get('ebay_settings_currency'));
+  define('EBAY_COUNTRY', variable_get('ebay_settings_country'));
   define('EBAY_ERRORLANGUAGE', variable_get('ebay_settings_errorlanguage'));
   define('EBAY_WARNINGLEVEL', variable_get('ebay_settings_warninglevel'));
-  define('EBAY_INVENTORY_TRACKING_METHOD', variable_get('ebay_settings_inventory_tracking_method'));
-  define('EBAY_CONDITION_ID', variable_get('ebay_settings_condition_id'));
+  define('EBAY_INVENTORY_TRACKING', variable_get('ebay_settings_inventory_tracking'));
+  define('EBAY_CONDITION', variable_get('ebay_settings_condition_id'));
 
   // Check Mode Sandbox Or Production
   if (EBAY_MODE == 'production') {
@@ -282,7 +220,7 @@ function ebay_commerce_get_time(){
 function ebay_commerce_test_upload(){
 
   // Build some values for testing
-  $inventorytracking = ebay_inventory_tracking_method();
+  $inventorytracking = EBAY_INVENTORY_TRACKING;
   $sku = rand();
   $title = random_title(20);
   $lorum =  file_get_contents('http://loripsum.net/api'); // Generate dummy from http://loripsum.net/
@@ -290,8 +228,6 @@ function ebay_commerce_test_upload(){
   $ebay_category = '88433';
   $price = rand(1,1000);
   $image = 'http://lorempixel.com/400/200/'; //http://dummyimage.com/300.png/09f/fff
-  $country = 'US';
-  $site = EBAY_SITE;
 
   // Create XMl data for uplaod.
   $requestXmlBody = "<Item>";
@@ -301,8 +237,7 @@ function ebay_commerce_test_upload(){
   $requestXmlBody .= "<Description>$description</Description>";
   $requestXmlBody .= "<PrimaryCategory><CategoryID>$ebay_category</CategoryID></PrimaryCategory>";
   $requestXmlBody .= "<StartPrice>$price</StartPrice>";
-
-  $requestXmlBody .= "<Country>$country</Country>";
+  $requestXmlBody .= "<Country>" . EBAY_COUNTRY ."</Country>";
   $requestXmlBody .= "<Currency>" . EBAY_CURRENCY . "</Currency>";
   $requestXmlBody .= "<DispatchTimeMax>1</DispatchTimeMax>";
   $requestXmlBody .= "<ListingDuration>GTC</ListingDuration>";
@@ -331,7 +266,7 @@ function ebay_commerce_test_upload(){
   $requestXmlBody .= "</ShippingServiceOptions>";
   $requestXmlBody .= "</ShippingDetails>";
 
-  $requestXmlBody .= "<Site>$site</Site>";
+  $requestXmlBody .= "<Site>" . EBAY_SITE . "</Site>";
   $requestXmlBody .= "</Item>";
 
   // Create and execute uplaod.
@@ -339,23 +274,6 @@ function ebay_commerce_test_upload(){
 
 }
 
-
-/**
- *  Check the inventory tracking method.
- *
- *  http://developer.ebay.com/DevZone/XML/docs/Reference/eBay/types/InventoryTrackingMethodCodeType.html
- */
-
-function ebay_inventory_tracking_method(){
-  //How do we track our product on Bay ?
-  if (EBAY_INVENTORY_TRACKING_METHOD == 1){
-      $inventorytracking = "SKU";
-    }
-    else{
-      $inventorytracking = "ItemID";
-    }
-  return $inventorytracking;
-}
 
 /**
  * Generates a random title for testing only.
