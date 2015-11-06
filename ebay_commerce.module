@@ -1,7 +1,9 @@
 <?php
 
 /**
- * eBay commerce module
+ * @file
+ * eBay commerce module.
+ *
  */
 
 
@@ -76,13 +78,13 @@ function ebay_commerce_permission() {
 /**
  * Checks for errors returned by eBay.
  *
- * @param $responseDoc
+ * @param $response
  *   Data returned by eBay.
  * @return
  *   True or Empty
  *
  * @code
- * $error = ebay_commerce_error_check($responseDoc);
+ * $error = ebay_commerce_error_check($response_doc);
  *  if(!$error) {
  *    // Code here
  *  }
@@ -90,26 +92,26 @@ function ebay_commerce_permission() {
  *
  * See : function ebay_commerce_action()
  */
-function ebay_commerce_error_check($responseDoc){
+function ebay_commerce_error_check($response) {
 
-  $errors = $responseDoc->getElementsByTagName('Errors');
+  $errors = $response->getElementsByTagName('Errors');
 
-  if($errors->length > 0) {
+  if ($errors->length > 0) {
 
     //Get error code, ShortMesaage and LongMessage
     $code = $errors->item(0)->getElementsByTagName('ErrorCode');
-    $shortMsg = $errors->item(0)->getElementsByTagName('ShortMessage');
-    $longMsg = $errors->item(0)->getElementsByTagName('LongMessage');
+    $short = $errors->item(0)->getElementsByTagName('ShortMessage');
+    $long = $errors->item(0)->getElementsByTagName('LongMessage');
 
     $url = 'http://developer.ebay.com/devzone/xml/docs/reference/ebay/errors/errormessages.htm';
 
     //Display code and shortmessage
-    $msg  = 'There were errors: <b>'  . $shortMsg->item(0)->nodeValue . '</b></br>';
+    $msg  = 'There were errors: <b>' . $short->item(0)->nodeValue . '</b></br>';
     $msg .= 'eBay returned: <b>ErrorCode ' . $code->item(0)->nodeValue . '</b></br>';
-    $msg .= 'eBay returned the following Message: <b>' . $longMsg->item(0)->nodeValue . '</b></br>';
-    $msg .= '<a href=' . $url .' target="_blank">See error numbers</a>';
+    $msg .= 'eBay returned the following Message: <b>' . $long->item(0)->nodeValue . '</b></br>';
+    $msg .= '<a href=' . $url . ' target="_blank">See error numbers</a>';
 
-    drupal_set_message(t($msg), 'error');
+    drupal_set_message(t(check_plain($msg)), 'error');
 
     return TRUE;
   }
@@ -122,7 +124,7 @@ function ebay_commerce_error_check($responseDoc){
  * @return
  *   eBay record
  */
-function ebay_commerce_action($action , $xml = NULL){
+function ebay_commerce_action($action , $xml = NULL) {
 
   $request = $action . 'Request';
   $responce = $action . 'Response';
@@ -130,15 +132,15 @@ function ebay_commerce_action($action , $xml = NULL){
   // Build XML data and POST it to eBay
 
   //Build the request Xml string
-  $requestXmlBody = '<?xml version="1.0" encoding="utf-8"?>';
-  $requestXmlBody .= '<' . $request . ' xmlns="urn:ebay:apis:eBLBaseComponents">';
-  $requestXmlBody .= '<RequesterCredentials><eBayAuthToken>' . EBAY_USER_TOKEN . '</eBayAuthToken></RequesterCredentials>';
-  $requestXmlBody .= '<ErrorLanguage>' . EBAY_ERRORLANGUAGE . '</ErrorLanguage>';
-  $requestXmlBody .= '<WarningLevel>' . EBAY_WARNINGLEVEL . '</WarningLevel>';
-  $requestXmlBody .= $xml;
-  $requestXmlBody .= '</' . $request . '>';
+  $xml_body = '<?xml version="1.0" encoding="utf-8"?>';
+  $xml_body .= '<' . $request . ' xmlns="urn:ebay:apis:eBLBaseComponents">';
+  $xml_body .= '<RequesterCredentials><eBayAuthToken>' . EBAY_USER_TOKEN . '</eBayAuthToken></RequesterCredentials>';
+  $xml_body .= '<ErrorLanguage>' . EBAY_ERRORLANGUAGE . '</ErrorLanguage>';
+  $xml_body .= '<WarningLevel>' . EBAY_WARNINGLEVEL . '</WarningLevel>';
+  $xml_body .= $xml;
+  $xml_body .= '</' . $request . '>';
 
-  dsm($requestXmlBody);
+  dsm($xml_body);
 
   //Create a new eBay session
   $session = new eBaySession(
@@ -153,24 +155,24 @@ function ebay_commerce_action($action , $xml = NULL){
   );
 
   // send the request and get response
-  $responseXml = $session->sendHttpRequest($requestXmlBody);
+  $response_xml = $session->sendHttpRequest($xml_body);
 
   // if no connection possible end request.
-  if(stristr($responseXml, 'HTTP 404') || $responseXml == ''){
+  if (stristr($response_xml, 'HTTP 404') || $response_xml == '') {
     drupal_set_message(t('Error sending request'), 'error');
     //die;
     return;
   }
 
   // Xml string is parsed and creates a DOM Document object
-  $responseDoc = new DomDocument();
-  $responseDoc->loadXML($responseXml);
+  $response_doc = new DomDocument();
+  $response_doc->loadXML($response_xml);
 
   // Error check
-  $error = ebay_commerce_error_check($responseDoc);
+  $error = ebay_commerce_error_check($response_doc);
 
-  if(!$error) {
-    $responses = $responseDoc->getElementsByTagName($responce);
+  if (!$error) {
+    $responses = $response_doc->getElementsByTagName($responce);
     return $responses;
   }
 
@@ -195,14 +197,14 @@ function ebay_commerce_action($action , $xml = NULL){
  *  }
  * @endcode
  */
-function ebay_commerce_get_time(){
+function ebay_commerce_get_time() {
 
   $record = ebay_commerce_action('GeteBayOfficialTime');
-  if($record){
+  if ($record) {
     foreach ($record as $response) {
       $variable = $response->getElementsByTagName('Timestamp');
       $baytime = strtotime($variable->item(0)->nodeValue);
-      $baytime_formatted = format_date($baytime,'custom', 'F j, Y - H:i');
+      $baytime_formatted = format_date($baytime, 'custom', 'F j, Y - H:i');
 
       $ebay_response = new stdClass();
       $ebay_response->time_raw = $baytime;
@@ -220,7 +222,7 @@ function ebay_commerce_get_time(){
  *
  * See : http://developer.ebay.com/devzone/xml/docs/reference/ebay/AddFixedPriceItem.html
  */
-function ebay_commerce_test_upload(){
+function ebay_commerce_test_upload() {
 
   // Build some values for testing
   $inventorytracking = EBAY_INVENTORY_TRACKING;
@@ -229,51 +231,51 @@ function ebay_commerce_test_upload(){
   $lorum =  file_get_contents('http://loripsum.net/api'); // Generate dummy from http://loripsum.net/
   $description = utf8_encode("<![CDATA[ " . $lorum . " ]]>");
   $ebay_category = '88433';
-  $price = rand(1,1000);
+  $price = rand(1, 1000);
   $image = 'http://lorempixel.com/400/200/'; //http://dummyimage.com/300.png/09f/fff
 
   // Create XMl data for uplaod.
-  $requestXmlBody = "<Item>";
-  $requestXmlBody .= "<InventoryTrackingMethod>$inventorytracking</InventoryTrackingMethod>";
-  $requestXmlBody .= "<SKU>$sku</SKU>";
-  $requestXmlBody .= "<Title>$title</Title>";
-  $requestXmlBody .= "<Description>$description</Description>";
-  $requestXmlBody .= "<PrimaryCategory><CategoryID>$ebay_category</CategoryID></PrimaryCategory>";
-  $requestXmlBody .= "<StartPrice>$price</StartPrice>";
-  $requestXmlBody .= "<Country>" . EBAY_COUNTRY ."</Country>";
-  $requestXmlBody .= "<Currency>" . EBAY_CURRENCY . "</Currency>";
-  $requestXmlBody .= "<DispatchTimeMax>1</DispatchTimeMax>";
-  $requestXmlBody .= "<ListingDuration>GTC</ListingDuration>";
-  $requestXmlBody .= "<ListingType>FixedPriceItem</ListingType>";
-  $requestXmlBody .= "<PaymentMethods>PayPal</PaymentMethods>";
-  $requestXmlBody .= "<PayPalEmailAddress>" . EBAY_USER_PAYPAL . "</PayPalEmailAddress>";
-  $requestXmlBody .= "<PictureDetails>";
-  $requestXmlBody .= "<PictureURL>$image</PictureURL>";
-  $requestXmlBody .= "</PictureDetails>";
-  $requestXmlBody .= "<PostalCode>95125</PostalCode>";
-  $requestXmlBody .= "<Quantity>1</Quantity>";
+  $xml_body = "<Item>";
+  $xml_body .= "<InventoryTrackingMethod>$inventorytracking</InventoryTrackingMethod>";
+  $xml_body .= "<SKU>$sku</SKU>";
+  $xml_body .= "<Title>$title</Title>";
+  $xml_body .= "<Description>$description</Description>";
+  $xml_body .= "<PrimaryCategory><CategoryID>$ebay_category</CategoryID></PrimaryCategory>";
+  $xml_body .= "<StartPrice>$price</StartPrice>";
+  $xml_body .= "<Country>" . EBAY_COUNTRY . "</Country>";
+  $xml_body .= "<Currency>" . EBAY_CURRENCY . "</Currency>";
+  $xml_body .= "<DispatchTimeMax>1</DispatchTimeMax>";
+  $xml_body .= "<ListingDuration>GTC</ListingDuration>";
+  $xml_body .= "<ListingType>FixedPriceItem</ListingType>";
+  $xml_body .= "<PaymentMethods>PayPal</PaymentMethods>";
+  $xml_body .= "<PayPalEmailAddress>" . EBAY_USER_PAYPAL . "</PayPalEmailAddress>";
+  $xml_body .= "<PictureDetails>";
+  $xml_body .= "<PictureURL>$image</PictureURL>";
+  $xml_body .= "</PictureDetails>";
+  $xml_body .= "<PostalCode>95125</PostalCode>";
+  $xml_body .= "<Quantity>1</Quantity>";
 
-  $requestXmlBody .= "<ReturnPolicy><ReturnsAcceptedOption>ReturnsAccepted</ReturnsAcceptedOption>";
-  $requestXmlBody .= "<ReturnsWithinOption>Days_14</ReturnsWithinOption>";
-  $requestXmlBody .= "<Description>If you are not satisfied, return the item for refund.</Description>";
-  $requestXmlBody .= "<ShippingCostPaidByOption>Buyer</ShippingCostPaidByOption>";
-  $requestXmlBody .= "</ReturnPolicy>";
+  $xml_body .= "<ReturnPolicy><ReturnsAcceptedOption>ReturnsAccepted</ReturnsAcceptedOption>";
+  $xml_body .= "<ReturnsWithinOption>Days_14</ReturnsWithinOption>";
+  $xml_body .= "<Description>If you are not satisfied, return the item for refund.</Description>";
+  $xml_body .= "<ShippingCostPaidByOption>Buyer</ShippingCostPaidByOption>";
+  $xml_body .= "</ReturnPolicy>";
 
-  $requestXmlBody .= "<ShippingDetails>";
-  $requestXmlBody .= "<ShippingType>Flat</ShippingType>";
-  $requestXmlBody .= "<ShippingServiceOptions>";
-  $requestXmlBody .= "<ShippingServicePriority>1</ShippingServicePriority>";
-  $requestXmlBody .= "<ShippingService>UPSGround</ShippingService>";
-  $requestXmlBody .= "<ShippingServiceAdditionalCost>0.00</ShippingServiceAdditionalCost>";
-  $requestXmlBody .= "<FreeShipping>true</FreeShipping>";
-  $requestXmlBody .= "</ShippingServiceOptions>";
-  $requestXmlBody .= "</ShippingDetails>";
+  $xml_body .= "<ShippingDetails>";
+  $xml_body .= "<ShippingType>Flat</ShippingType>";
+  $xml_body .= "<ShippingServiceOptions>";
+  $xml_body .= "<ShippingServicePriority>1</ShippingServicePriority>";
+  $xml_body .= "<ShippingService>UPSGround</ShippingService>";
+  $xml_body .= "<ShippingServiceAdditionalCost>0.00</ShippingServiceAdditionalCost>";
+  $xml_body .= "<FreeShipping>true</FreeShipping>";
+  $xml_body .= "</ShippingServiceOptions>";
+  $xml_body .= "</ShippingDetails>";
 
-  $requestXmlBody .= "<Site>" . EBAY_COUNTRY . "</Site>";
-  $requestXmlBody .= "</Item>";
+  $xml_body .= "<Site>" . EBAY_COUNTRY . "</Site>";
+  $xml_body .= "</Item>";
 
   // Create and execute uplaod.
-  $record = ebay_commerce_action('AddFixedPriceItem', $requestXmlBody);
+  $record = ebay_commerce_action('AddFixedPriceItem', $xml_body);
 
 }
 
@@ -293,7 +295,7 @@ function random_title($length) {
   $num_cons = count($cons);
   $word = '';
 
-  while(strlen($word) < $length){
+  while (strlen($word) < $length) {
     $word .= $cons[mt_rand(0, $num_cons - 1)] . $vowels[mt_rand(0, $num_vowels - 1)];
   }
 
