@@ -5,34 +5,125 @@
 function ebay_commerce_loader_schema() {
   $schema = array();
 
+// Sites
   $schema['ebay_commerce_sites'] = array(
-    'description' => t('The base table for nodes.'),
+    'description' => t('The base table.'),
     'fields' => array(
       'ecsid' => array(
-        'description' => 'The primary identifier for a node.',
+        'description' => 'The primary identifier.',
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE),
       'site_id' => array(
-        'description' => 'The current {node_revisions}.vid version identifier.',
+        'description' => 'The site id.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0),
-      'site' => array(
-        'description' => 'The title of this node, always treated a non-markup plain text.',
+      'name' => array(
+        'description' => 'The site name.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''),
       ),
     'indexes' => array(
-      'site' => array('site'),
+      'name' => array('name'),
       ),
     'unique keys' => array(
       'site_id' => array('site_id'),
       ),
     'primary key' => array('ecsid'),
+    );
+
+// Country
+  $schema['ebay_commerce_country'] = array(
+    'description' => t('The base table for country details.'),
+    'fields' => array(
+      'eccid' => array(
+        'description' => 'The primary identifier.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE),
+      'country_code' => array(
+        'description' => 'The country short code like NL.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => ''),
+      'name' => array(
+        'description' => 'The long name of the country.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => ''),
+      ),
+    'indexes' => array(
+      'name' => array('name'),
+      ),
+    'unique keys' => array(
+      'country_code' => array('country_code'),
+      ),
+    'primary key' => array('eccid'),
+    );
+
+// Currency
+  $schema['ebay_commerce_currency'] = array(
+    'description' => t('The base table for currency details.'),
+    'fields' => array(
+      'eccuid' => array(
+        'description' => 'The primary identifier.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE),
+      'currency_code' => array(
+        'description' => 'The currency short code like EUR.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => ''),
+      'name' => array(
+        'description' => 'The long name of the currency.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => ''),
+      ),
+    'indexes' => array(
+      'name' => array('name'),
+      ),
+    'unique keys' => array(
+      'currency_code' => array('currency_code'),
+      ),
+    'primary key' => array('eccuid'),
+    );
+
+// URLs
+  $schema['ebay_commerce_url'] = array(
+    'description' => t('The base table for url details.'),
+    'fields' => array(
+      'ecurlid' => array(
+        'description' => 'The primary identifier.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE),
+      'url_type' => array(
+        'description' => 'The of URL.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => ''),
+      'url' => array(
+        'description' => 'The url.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => ''),
+      ),
+    'unique keys' => array(
+      'url_type' => array('url_type'),
+      ),
+    'primary key' => array('ecurlid'),
     );
 
   return $schema;
