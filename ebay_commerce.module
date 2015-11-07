@@ -191,7 +191,7 @@ function ebay_commerce_action($action , $xml = NULL) {
  *
  * @code
  * $ebay = ebay_commerce_get_time();
- *  if($time) {
+ *  if($ebay) {
  *    print $ebay->time_raw;
  *    print $ebay->time_format;
  *  }

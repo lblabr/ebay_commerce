@@ -144,7 +144,7 @@ function ebay_commerce_settings_form() {
   // Select Condition
   $form['first']['ebay_settings_condition_id'] = array(
   '#type' => 'select',
-  '#title' =>('Condition',
+  '#title' =>'Condition',
   '#default_value' => variable_get('ebay_settings_condition_id'),
   '#options' => array(
     '1000' => t('New'),
