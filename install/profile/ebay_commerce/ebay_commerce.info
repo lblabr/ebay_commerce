@@ -1,0 +1,33 @@
+name = eBay Commerce
+distribution_name = eBay commerce
+description = Default install for eBay commerce.
+core = 7.x
+exclusive = 1
+
+; Core
+dependencies[] = dblog
+dependencies[] = field
+dependencies[] = field_ui
+dependencies[] = image
+dependencies[] = list
+dependencies[] = menu
+dependencies[] = number
+dependencies[] = path
+dependencies[] = system
+dependencies[] = overlay
+dependencies[] = taxonomy
+dependencies[] = contextual
+
+; Contribs
+dependencies[] = ctools
+dependencies[] = entity
+dependencies[] = rules
+dependencies[] = strongarm
+dependencies[] = views
+
+; Contribs development
+dependencies[] = admin_menu
+dependencies[] = admin_menu_toolbar
+dependencies[] = devel
+dependencies[] = module_filter
+dependencies[] = coder
