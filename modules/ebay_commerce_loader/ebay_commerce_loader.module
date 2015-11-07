@@ -178,6 +178,73 @@ function ebay_commerce_get_url() {
 
 
 /**
+ * Connect to eBay and retrieve user information
+ * eBay GetUser.
+ *
+ * http://developer.ebay.com/DevZone/XML/docs/Reference/eBay/GetUser.html
+ * @code
+ * $result = ebay_commerce_get_user();
+ *   foreach ($result as $record) {
+ *     dsm($record);
+ *   }
+ * @endcode
+ *
+ */
+
+function ebay_commerce_get_user() {
+
+  if (EBAY_MODE == 'production') {
+    $username = variable_get('ebay_user_id');
+  }else {
+    $username = variable_get('ebay_admin_sandbox_user_id');
+  }
+
+  $xml_body = '<UserID>' . $username . '</UserID>';
+  $record = ebay_commerce_action('GetUser', $xml_body);
+
+  if ($record) {
+    foreach ($record as $value) {
+      $responses = $value->getElementsByTagName('User');
+
+        foreach ($responses as $response) {
+
+          $variable = $response->getElementsByTagName('EIASToken');
+          $token = strtolower($variable->item(0)->nodeValue);
+
+          $variable = $response->getElementsByTagName('UserID');
+          $identifier = strtolower($variable->item(0)->nodeValue);
+
+          $variable = $response->getElementsByTagName('Email');
+          $name = $variable->item(0)->nodeValue;
+
+          $variable = $response->getElementsByTagName('StoreOwner');
+          $store_owner = $variable->item(0)->nodeValue;
+
+          $variable = $response->getElementsByTagName('StoreURL');
+          $store_url = $variable->item(0)->nodeValue;
+
+          $variable = $response->getElementsByTagName('StoreSite');
+          $store_site = $variable->item(0)->nodeValue;
+
+          $ebay = array(
+            'id' => $identifier,
+            'email' => $name,
+            'store'=> array(
+              'owner' => $store_owner,
+              'url' => $store_url,
+              'site' => $store_site,
+             ),
+            'token' => $token,
+          );
+        }
+    }
+   return $ebay;
+  }
+}
+
+
+
+/**
  * Insert eBay site information in the database.
  * Table : ebay_commerce_sites.
  */
