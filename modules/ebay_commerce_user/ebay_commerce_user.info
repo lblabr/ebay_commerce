@@ -1,0 +1,4 @@
+name = eBay user
+description = Get user details from eBay.
+package = eBay
+core = 7.x

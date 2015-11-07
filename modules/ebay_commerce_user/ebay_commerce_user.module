@@ -1,0 +1,98 @@
+<?php
+
+/**
+ * eBay commerce user module.
+ * Get user details from eBay.
+ *
+ */
+
+
+/**
+ * Implements hook_menu().
+ */
+
+function ebay_commerce_user_menu() {
+  $items = array();
+
+/* Development Menu */
+
+  $items['admin/ebay/user'] = array(
+    'title' => 'User',
+    'description' => 'eBay user information.',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('administer ebay'),
+    'type' => MENU_NORMAL_ITEM,
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+    'weight' => 49,
+  );
+
+   $items['admin/ebay/user/profile'] = array(
+    'title' => t('Profile'),
+    'description' => t('Your eBay user details.'),
+    'page callback' => 'ebay_commerce_user_page_profile',
+    'access arguments' => array('administer ebay'),
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 1
+  );
+
+  return $items;
+
+}
+
+
+/**
+ * Page callback sets up and returns the content for the Page Name page
+ */
+function ebay_commerce_user_page_profile() {
+
+  global $user;
+
+  $module_path = drupal_get_path('module', 'ebay_commerce_user');
+
+  // Add any required jQuery libraries JavaScript.
+  //drupal_add_js($module_path . '/theme/js/ebay_commerce_devel.js');
+
+  // Add the module path to Drupal.extend. DELETE IF UNNECESSARY!
+  // http://dropbucket.org/node/32
+  //$data = array(
+  //  'ebay_commerce_devel' => array (
+  //    'path' => $module_path,
+  //  ),
+  //);
+  //drupal_add_js($data, 'setting');
+
+  // Add the page CSS. DELETE IF UNNECESSARY!
+  //drupal_add_css($module_path . '/theme/css/ebay_commerce_devel.css');
+
+  // Render the theme function for this page
+  // NOTE: Pass any required variables to theme function using array, see Drupal API.
+
+  $ebay_commerce_user = ebay_commerce_get_user();
+
+  return theme('ebay_commerce_user', array (
+    'ebay_user' => $ebay_commerce_user,
+  ));
+
+}
+
+/**
+ * Implements hook_theme.
+ */
+function ebay_commerce_user_theme() {
+  return array (
+    'ebay_commerce_user' => array (
+      'variables' => array (
+        // Specifies available variables.
+       'ebay_user' => NULL,
+      ),
+      // This allows you to create a tpl file commerce_discounts_main.tpl.php.
+      // It will be automatically loaded by Drupal.
+      'template' => 'ebay_commerce_user_profile',
+    ),
+  );
+}
+
+/**
+ * Get use info from eBay.
+ */
