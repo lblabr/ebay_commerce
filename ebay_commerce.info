@@ -5,6 +5,8 @@ core = 7.x
 
 ; Module includes
 files[] = includes/lib/eBaySession.inc
+files[] = includes/lib/eBayLoad.inc
+files[] = includes/lib/eBayUser.inc
 
 ; Simple tests
 files[] = test/ebay_commerce.test
