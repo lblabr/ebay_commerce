@@ -14,13 +14,13 @@ function ebay_commerce_loader_schema() {
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE),
-      'site_id' => array(
+      'siteid' => array(
         'description' => 'The site id.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
         'default' => 0),
-      'name' => array(
+      'site' => array(
         'description' => 'The site name.',
         'type' => 'varchar',
         'length' => 255,
@@ -28,10 +28,10 @@ function ebay_commerce_loader_schema() {
         'default' => ''),
       ),
     'indexes' => array(
-      'name' => array('name'),
+      'site' => array('site'),
       ),
     'unique keys' => array(
-      'site_id' => array('site_id'),
+      'siteid' => array('siteid'),
       ),
     'primary key' => array('ecsid'),
     );
@@ -45,13 +45,13 @@ function ebay_commerce_loader_schema() {
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE),
-      'country_code' => array(
+      'country' => array(
         'description' => 'The country short code like NL.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''),
-      'name' => array(
+      'description' => array(
         'description' => 'The long name of the country.',
         'type' => 'varchar',
         'length' => 255,
@@ -59,10 +59,10 @@ function ebay_commerce_loader_schema() {
         'default' => ''),
       ),
     'indexes' => array(
-      'name' => array('name'),
+      'description' => array('description'),
       ),
     'unique keys' => array(
-      'country_code' => array('country_code'),
+      'country' => array('country'),
       ),
     'primary key' => array('eccid'),
     );
@@ -76,13 +76,13 @@ function ebay_commerce_loader_schema() {
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE),
-      'currency_code' => array(
+      'currency' => array(
         'description' => 'The currency short code like EUR.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => ''),
-      'name' => array(
+      'description' => array(
         'description' => 'The long name of the currency.',
         'type' => 'varchar',
         'length' => 255,
@@ -90,10 +90,10 @@ function ebay_commerce_loader_schema() {
         'default' => ''),
       ),
     'indexes' => array(
-      'name' => array('name'),
+      'description' => array('description'),
       ),
     'unique keys' => array(
-      'currency_code' => array('currency_code'),
+      'currency' => array('currency'),
       ),
     'primary key' => array('eccuid'),
     );
@@ -107,7 +107,7 @@ function ebay_commerce_loader_schema() {
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE),
-      'url_type' => array(
+      'urltype' => array(
         'description' => 'The of URL.',
         'type' => 'varchar',
         'length' => 255,
@@ -121,7 +121,7 @@ function ebay_commerce_loader_schema() {
         'default' => ''),
       ),
     'unique keys' => array(
-      'url_type' => array('url_type'),
+      'urltype' => array('urltype'),
       ),
     'primary key' => array('ecurlid'),
     );
