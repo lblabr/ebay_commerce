@@ -263,7 +263,7 @@ function ebay_commerce_select_site(){
   $result = ebay_commerce_load_site();
   $options = array();
     foreach ($result as $key => $record) {
-      $options[$record->site_id] = $record->name;
+      $options[$record->siteid] = $record->site;
     }
   asort($options);
   return $options;
@@ -278,7 +278,7 @@ function ebay_commerce_select_currency(){
   $result = ebay_commerce_load_currency();
   $options = array();
     foreach ($result as $key => $record) {
-      $options[strtoupper($record->currency_code)] = $record->name;
+      $options[strtoupper($record->currency)] = $record->description;
     }
   asort($options);
   return $options;
@@ -293,7 +293,7 @@ function ebay_commerce_select_country(){
   $result = ebay_commerce_load_country();
   $options = array();
     foreach ($result as $key => $record) {
-      $options[strtoupper($record->country_code)] = $record->name;
+      $options[strtoupper($record->country)] = $record->description;
     }
   asort($options);
   return $options;
