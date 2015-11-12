@@ -7,13 +7,13 @@
 
 class eBaySession {
 
-  private $requestToken;
-  private $devID;
-  private $appID;
-  private $certID;
-  private $serverUrl;
-  private $compatLevel;
-  private $siteID;
+  //private $requestToken;
+  //private $devID;
+  //private $appID;
+  //private $certID;
+  //private $serverUrl;
+  //private $compatLevel;
+  //private $siteID;
   private $verb;
 
 
@@ -33,16 +33,16 @@ Output:	Response string returned by the server
 
 */
 
-public function __construct($userRequestToken, $developerID, $applicationID, $certificateID, $serverUrl, $compatabilityLevel, $siteToUseID, $callName) {
+public function __construct($callName) {
 
-  $this->requestToken = $userRequestToken;
-  $this->devID = $developerID;
-  $this->appID = $applicationID;
-  $this->certID = $certificateID;
-  $this->compatLevel = $compatabilityLevel;
-  $this->siteID = $siteToUseID;
+  $this->requestToken = EBAY_USER_TOKEN;
+  $this->devID = EBAY_DEVELOPER_ID;
+  $this->appID = EBAY_APPLICATION_ID;
+  $this->certID = EBAY_CERT_ID;
+  $this->compatLevel = EBAY_API;
+  $this->siteID = EBAY_SITE;
   $this->verb = $callName;
-  $this->serverUrl = $serverUrl;
+  $this->serverUrl = EBAY_SERVER_URL;
 
 }
 
