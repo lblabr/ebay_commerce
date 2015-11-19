@@ -1,6 +1,6 @@
-name = eBay Commerce
-distribution_name = eBay commerce
-description = Default install for eBay commerce.
+name = Commercebay
+distribution_name = Commercebay
+description = Development profile for eBay commerce.
 core = 7.x
 exclusive = 1
 
@@ -22,7 +22,6 @@ dependencies[] = contextual
 dependencies[] = ctools
 dependencies[] = entity
 dependencies[] = rules
-dependencies[] = strongarm
 dependencies[] = views
 
 ; Contribs development
@@ -30,4 +29,4 @@ dependencies[] = admin_menu
 dependencies[] = admin_menu_toolbar
 dependencies[] = devel
 dependencies[] = module_filter
-dependencies[] = coder
+dependencies[] = coder_review

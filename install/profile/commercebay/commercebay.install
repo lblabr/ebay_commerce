@@ -1,21 +1,20 @@
 <?php
 /**
  * @file
- * Install, update and uninstall functions for the Commerce deploy installation profile.
+ * Install, update and uninstall functions for the eBay Commerce installation profile.
  */
 
 /**
  * Implements hook_install_tasks_alter().
  */
-function ebay_commerce_install_tasks_alter(&$tasks, $install_state) {
+function commercebay_install_tasks_alter(&$tasks, $install_state) {
   $tasks['install_select_profile']['display'] = FALSE;
-
 }
 
 /**
  * Implements hook_install().
  */
-function ebay_commerce_install() {
+function commercebay_install() {
 
   // Enable the admin theme.
   db_update('system')

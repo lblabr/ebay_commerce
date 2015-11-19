@@ -13,3 +13,6 @@ projects[admin_menu][subdir] = development
 projects[module_filter][subdir] = development
 projects[examples][subdir] = development
 projects[coder][subdir] = development
+projects[strongarm][subdir] = development
+projects[features][subdir] = development
+

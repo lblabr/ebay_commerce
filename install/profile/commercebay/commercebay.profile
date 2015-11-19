@@ -3,7 +3,7 @@
 /**
  * Test
  */
-function ebay_commerce_preprocess_maintenance_page(&$variables) {
+function commercebay_preprocess_maintenance_page(&$variables) {
 
 }
 
@@ -14,7 +14,7 @@ function ebay_commerce_preprocess_maintenance_page(&$variables) {
  * Allows the profile to alter the site configuration form.
  */
 
-function ebay_commerce_form_install_configure_form_alter(&$form, $form_state) {
+function commercebay_form_install_configure_form_alter(&$form, $form_state) {
   // When using Drush, let it set the default password.
   if (drupal_is_cli()) {
     return;
@@ -38,17 +38,17 @@ function ebay_commerce_form_install_configure_form_alter(&$form, $form_state) {
   $form['update_notifications']['#access'] = FALSE;
 
   // Add informations about the default username and password.
-  $form['admin_account']['account']['ebay_commerce_name'] = array(
+  $form['admin_account']['account']['commercebay_name'] = array(
     '#type' => 'item',
     '#title' => st('Username'),
     '#markup' => 'admin'
   );
-  $form['admin_account']['account']['ebay_commerce_password'] = array(
+  $form['admin_account']['account']['commercebay_password'] = array(
     '#type' => 'item',
     '#title' => st('Password'),
     '#markup' => 'admin'
   );
-  $form['admin_account']['account']['ebay_commerce_informations'] = array(
+  $form['admin_account']['account']['commercebay_informations'] = array(
     '#markup' => '<p>' . t('This information will be emailed to the store email address.') . '</p>'
   );
   $form['admin_account']['override_account_informations'] = array(
@@ -79,14 +79,14 @@ function ebay_commerce_form_install_configure_form_alter(&$form, $form_state) {
 
   // Add a custom validation that needs to be trigger before the original one,
   // where we can copy the site's mail as the admin account's mail.
-  array_unshift($form['#validate'], 'ebay_commerce_custom_setting');
+  array_unshift($form['#validate'], 'commercebay_custom_setting');
 }
 
 /**
  * Validate callback; Populate the admin account mail, user and password with
  * custom values.
  */
-function ebay_commerce_custom_setting(&$form, &$form_state) {
+function commercebay_custom_setting(&$form, &$form_state) {
   $form_state['values']['account']['mail'] = $form_state['values']['site_mail'];
   // Use our custom values only the corresponding checkbox is checked.
   if ($form_state['values']['override_account_informations'] == TRUE) {
