@@ -7,7 +7,6 @@
  */
 
 
-
 /**
  * Implements hook_permission().
  */
@@ -37,10 +36,14 @@ function ebay_commerce_permission() {
 /**
  *  Define constants
  *
- * I store user data in variables for easy development.
- * Should be stored in the database and be secured.
+ * We store user data in variables for easy development.
+ * Should be be secured, could use encryption module.
+ * https://www.drupal.org/project/aes
+ * https://www.drupal.org/project/encrypt
+ * Or store values in settings.php
+ * using `$conf['ebay_admin_sandbox_user_id'] = 'TESTUSER_yourname';`
  *
- * TODO : Store user data in DB and secure user credentials.
+ * TODO : Secure user credentials.
  *
  */
 
@@ -49,15 +52,14 @@ function ebay_commerce_permission() {
   define('EBAY_SITE', variable_get('ebay_settings_site_id'));
   define('EBAY_CURRENCY', variable_get('ebay_settings_currency'));
   define('EBAY_COUNTRY', variable_get('ebay_settings_country'));
-  define('EBAY_ERRORLANGUAGE', variable_get('ebay_settings_errorlanguage'));
-  define('EBAY_WARNINGLEVEL', variable_get('ebay_settings_warninglevel'));
+  define('EBAY_ERROR_LANGUAGE', variable_get('ebay_settings_errorlanguage'));
+  define('EBAY_WARNING_LEVEL', variable_get('ebay_settings_warninglevel'));
   define('EBAY_INVENTORY_TRACKING', variable_get('ebay_settings_inventory_tracking'));
   define('EBAY_CONDITION', variable_get('ebay_settings_condition_id'));
 
   // Check Mode Sandbox Or Production
   if (EBAY_MODE == 'production') {
     // production environment
-
     define('EBAY_USER_ID', variable_get('ebay_user_id'));
     define('EBAY_DEVELOPER_ID', variable_get('ebay_admin_production_dev_id'));
     define('EBAY_APPLICATION_ID', variable_get('ebay_admin_production_app_id'));
@@ -79,12 +81,38 @@ function ebay_commerce_permission() {
 
 
 /**
+ * Check if all user settings are available before
+ * making a connecting to ebay.
+ * @return [Boolean] [True or False]
+ */
+function ebay_commerce_settings_check() {
+
+  //Set the values we want to check.
+  $items = array(
+    EBAY_USER_ID,
+    EBAY_DEVELOPER_ID,
+    EBAY_APPLICATION_ID,
+    EBAY_CERT_ID,
+    EBAY_SERVER_URL,
+    EBAY_USER_TOKEN,
+    EBAY_USER_PAYPAL
+  );
+
+  foreach ($items as $value) {
+    if (!$value) {
+      return FALSE;
+    }
+  }
+  return TRUE;
+
+}
+
+
+/**
  * Checks for errors returned by eBay.
  *
- * @param $response
- *   Data returned by eBay.
- * @return
- *   True or Empty
+ * @param  [DOMNodeList] $response [Xml data returned by eBay.]
+ * @return [Boolean] [True or False]
  *
  * @code
  * $error = ebay_commerce_error_check($response_doc);
@@ -97,78 +125,83 @@ function ebay_commerce_permission() {
  */
 function ebay_commerce_error_check($response) {
 
-  $errors = $response->getElementsByTagName('Errors');
+  if ($response) {
+    $errors = $response->getElementsByTagName('Errors');
 
-  if ($errors->length > 0) {
+    if ($errors->length > 0) {
 
-    //Get error code, ShortMesaage and LongMessage
-    $code = $errors->item(0)->getElementsByTagName('ErrorCode');
-    $short = $errors->item(0)->getElementsByTagName('ShortMessage');
-    $long = $errors->item(0)->getElementsByTagName('LongMessage');
+      //Get error code, ShortMesaage and LongMessage
+      $code = $errors->item(0)->getElementsByTagName('ErrorCode');
+      $short = $errors->item(0)->getElementsByTagName('ShortMessage');
+      $long = $errors->item(0)->getElementsByTagName('LongMessage');
 
-    $url = 'http://developer.ebay.com/devzone/xml/docs/reference/ebay/errors/errormessages.htm';
+      $url = 'http://developer.ebay.com/devzone/xml/docs/reference/ebay/errors/errormessages.htm';
 
-    //Display code and shortmessage
-    $msg  = 'There were errors: <b>' . $short->item(0)->nodeValue . '</b></br>';
-    $msg .= 'eBay returned: <b>ErrorCode ' . $code->item(0)->nodeValue . '</b></br>';
-    $msg .= 'eBay returned the following Message: <b>' . $long->item(0)->nodeValue . '</b></br>';
-    $msg .= '<a href=' . $url . ' target="_blank">See error numbers</a>';
+      //Display code and shortmessage
+      $msg  = 'There were errors: <b>' . $short->item(0)->nodeValue . '</b></br>';
+      $msg .= 'eBay returned: <b>ErrorCode ' . $code->item(0)->nodeValue . '</b></br>';
+      $msg .= 'eBay returned the following Message: <b>' . $long->item(0)->nodeValue . '</b></br>';
+      $msg .= '<a href=' . $url . ' target="_blank">See error numbers</a>';
 
-    drupal_set_message(t(check_plain($msg)), 'error');
-
-    return TRUE;
+      return $msg;
+    }
   }
-
+  return FALSE;
 } // End function
 
 /**
- * Creates a call/action to eBay.
- *
- * @return
- *   eBay record
+ * [ebay_commerce_action creates a call/action to eBay]
+ * @param  [string] $action [The eBay action u want to use like GeteBayOfficialTime.]
+ * @param  [xml] $xml [defaults to NULL]
+ * @return [DOMNodeList|FALSE]         [description]
  */
+
 function ebay_commerce_action($action , $xml = NULL) {
 
-  $request = $action . 'Request';
-  $responce = $action . 'Response';
+  if(ebay_commerce_settings_check()) {
+    $request = $action . 'Request';
+    $response = $action . 'Response';
 
-  // Build XML data and POST it to eBay
+    // Build XML data and POST it to eBay
 
-  //Build the request Xml string
-  $xml_body = '<?xml version="1.0" encoding="utf-8"?>';
-  $xml_body .= '<' . $request . ' xmlns="urn:ebay:apis:eBLBaseComponents">';
-  $xml_body .= '<RequesterCredentials><eBayAuthToken>' . EBAY_USER_TOKEN . '</eBayAuthToken></RequesterCredentials>';
-  $xml_body .= '<ErrorLanguage>' . EBAY_ERRORLANGUAGE . '</ErrorLanguage>';
-  $xml_body .= '<WarningLevel>' . EBAY_WARNINGLEVEL . '</WarningLevel>';
-  $xml_body .= $xml;
-  $xml_body .= '</' . $request . '>';
+    //Build the request Xml string
+    $xml_body = '<?xml version="1.0" encoding="utf-8"?>';
+    $xml_body .= '<' . $request . ' xmlns="urn:ebay:apis:eBLBaseComponents">';
+    $xml_body .= '<RequesterCredentials><eBayAuthToken>' . EBAY_USER_TOKEN . '</eBayAuthToken></RequesterCredentials>';
+    $xml_body .= '<ErrorLanguage>' . EBAY_ERROR_LANGUAGE . '</ErrorLanguage>';
+    $xml_body .= '<WarningLevel>' . EBAY_WARNING_LEVEL . '</WarningLevel>';
+    $xml_body .= $xml;
+    $xml_body .= '</' . $request . '>';
 
-  dsm($xml_body);
+    //dsm($xml_body);
 
-  //Create a new eBay session
-  $session = new eBaySession( $action );
+    //Create a new eBay session
+    $session = new eBaySession( $action );
 
-  // send the request and get response
-  $response_xml = $session->sendHttpRequest($xml_body);
+    // send the request and get response
+    $response_xml = $session->sendHttpRequest($xml_body);
 
-  // if no connection possible end request.
-  if (stristr($response_xml, 'HTTP 404') || $response_xml == '') {
-    drupal_set_message(t('Error sending request'), 'error');
-    //die;
-    return;
+    // if no connection possible end request.
+    if (stristr($response_xml, 'HTTP 404') || $response_xml == '') {
+      drupal_set_message(t('Error sending request'), 'error');
+      return FALSE;
+    }
+
+    // Xml string is parsed and creates a DOM Document object
+    $response_doc = new DomDocument();
+    $response_doc->loadXML($response_xml);
+
+    // Error check
+    $error = ebay_commerce_error_check($response_doc);
+    if ($error) {
+      drupal_set_message(t($error), 'error');
+      return FALSE;
+    }else{
+      $responses = $response_doc->getElementsByTagName($response);
+      return $responses;
+    }
   }
-
-  // Xml string is parsed and creates a DOM Document object
-  $response_doc = new DomDocument();
-  $response_doc->loadXML($response_xml);
-
-  // Error check
-  $error = ebay_commerce_error_check($response_doc);
-  if (!$error) {
-    $responses = $response_doc->getElementsByTagName($responce);
-    return $responses;
-  }
-
+  return FALSE;
 } // End function
 
 
@@ -269,7 +302,10 @@ function ebay_commerce_test_upload() {
 
   // Create and execute uplaod.
   $record = ebay_commerce_action('AddFixedPriceItem', $xml_body);
-
+  if ($record) {
+    # code...
+  }
+  return $record;
 }
 
 

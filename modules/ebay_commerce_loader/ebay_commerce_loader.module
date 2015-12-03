@@ -45,9 +45,9 @@ function ebay_commerce_build_array() {
  */
 
 function ebay_commerce_get_site() {
-  $xml = '<DetailName>SiteDetails</DetailName>';
-  $record = new eBayLoad('GeteBayDetails', $xml, 'SiteDetails');
-  $element = $record->eBayElement('SiteID', 'Site');
+    $xml = '<DetailName>SiteDetails</DetailName>';
+    $record = new eBayLoad('GeteBayDetails', $xml, 'SiteDetails');
+    $element = $record->eBayElement('SiteID', 'Site');
   return $element;
 }
 
@@ -137,8 +137,6 @@ function ebay_commerce_get_user() {
   $user = $record->eBayUser('UserID');
   return $user;
 }
-
-
 
 /**
  * Insert eBay site information in the database.
@@ -260,7 +258,12 @@ function ebay_commerce_save_values() {
 function ebay_commerce_load_site() {
   $query=db_select('ebay_commerce_sites', 'a')
    ->fields('a', array('siteid', 'site'));
-  $result= $query->execute();
+  $result = $query->execute();
+  $count = $query->countQuery()->execute()->fetchField();
+  if ($count == 0) {
+    ebay_commerce_save_site();
+    $result = $query->execute();
+  }
   return $result;
 }
 
@@ -278,7 +281,12 @@ function ebay_commerce_load_site() {
 function ebay_commerce_load_country() {
   $query=db_select('ebay_commerce_country', 'a')
    ->fields('a', array('country', 'description'));
-  $result= $query->execute();
+  $result = $query->execute();
+  $count = $query->countQuery()->execute()->fetchField();
+  if ($count == 0) {
+    ebay_commerce_save_country();
+    $result = $query->execute();
+  }
   return $result;
 }
 
@@ -297,7 +305,12 @@ function ebay_commerce_load_country() {
 function ebay_commerce_load_currency() {
   $query=db_select('ebay_commerce_currency', 'a')
    ->fields('a', array('currency', 'description'));
-  $result= $query->execute();
+  $result = $query->execute();
+  $count = $query->countQuery()->execute()->fetchField();
+  if ($count == 0) {
+    ebay_commerce_save_currency();
+    $result = $query->execute();
+  }
   return $result;
 }
 
@@ -315,6 +328,11 @@ function ebay_commerce_load_currency() {
 function ebay_commerce_load_url() {
   $query=db_select('ebay_commerce_url', 'a')
    ->fields('a', array('urltype', 'url'));
-  $result= $query->execute();
+  $result = $query->execute();
+  $count = $query->countQuery()->execute()->fetchField();
+  if ($count == 0) {
+    ebay_commerce_save_url();
+    $result = $query->execute();
+  }
   return $result;
 }

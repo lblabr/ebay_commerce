@@ -4,3 +4,12 @@
  * @file
  * Install, update, and uninstall functions for the eBay commerce module.
  */
+
+/**
+ * Implements hook_install()
+ */
+function ebay_commerce_install(){
+
+}
+
+

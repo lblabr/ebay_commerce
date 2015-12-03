@@ -34,8 +34,8 @@ function ebay_commerce_settings_form() {
     '#title' => 'Ebay Mode',
     '#default_value' => variable_get('ebay_settings_mode'),
     '#options' => array(
-      'production' => t('Production'),
       'sandbox' => t('Sandbox'),
+      'production' => t('Production'),
      ),
     '#ajax' => array(
       'callback' => 'ebay_admin_settings_ajax_callback_mode',
@@ -55,7 +55,6 @@ function ebay_commerce_settings_form() {
       '849' => t('849'),
       '850' => t('850'),
       '945' => t('945'),
-
     ),
     '#ajax' => array(
       'callback' => 'ebay_admin_settings_ajax_callback_api',
@@ -67,7 +66,7 @@ function ebay_commerce_settings_form() {
     '#type' => 'select',
     '#title' => 'Default Site ID',
     '#description' => 'The eBay site you want to upload to.',
-    '#default_value' => variable_get('ebay_settings_site_id'),
+    '#default_value' => ebay_commerce_default_site(),
     '#options' => ebay_commerce_select_site(),
     '#ajax' => array(
       'callback' => 'ebay_admin_settings_ajax_callback_site_id',
@@ -79,7 +78,7 @@ function ebay_commerce_settings_form() {
   '#type' => 'select',
   '#title' => 'Default currency',
   '#description' => 'The currency should match the site.',
-  '#default_value' => variable_get('ebay_settings_currency'),
+  '#default_value' => ebay_commerce_default_currency(),
   '#options' => ebay_commerce_select_currency(),
   '#ajax' => array(
     'callback' => 'ebay_admin_settings_ajax_callback_currency',
@@ -91,13 +90,12 @@ function ebay_commerce_settings_form() {
     '#type' => 'select',
     '#title' => 'Your country',
     '#description' => 'The country your operating from.',
-    '#default_value' => variable_get('ebay_settings_country'),
+    '#default_value' => ebay_commerce_default_country(),
     '#options' => ebay_commerce_select_country(),
     '#ajax' => array(
       'callback' => 'ebay_admin_settings_ajax_callback_country',
     ),
   );
-
 
   // Select Error Language
   $form['first']['ebay_settings_errorlanguage'] = array(
@@ -176,7 +174,7 @@ function ebay_commerce_settings_form() {
  */
 
 function ebay_admin_settings_submit($form, $form_state) {
-  // Kept it empty, intentionally.
+  // code.
 }
 
 
@@ -256,45 +254,107 @@ function ebay_admin_settings_ajax_callback_condition_id($form, $form_state) {
 
 
 /**
- * Load site values from database to fill a select list.
+ * Load site default for a select list.
+ * We want a default value in case the user has not yet made a connection eBay. *
+ * https://developer.ebay.com/DevZone/merchandising/docs/Concepts/SiteIDToGlobalID.html
+ *
+ * @return [string] [eBay Site ID]
  */
-function ebay_commerce_select_site(){
+function ebay_commerce_default_site() {
+  $default_site = (EBAY_SITE) ? EBAY_SITE : '0'; // Default = US
+  return $default_site;
+}
 
-  $result = ebay_commerce_load_site();
-  $options = array();
+
+/**
+ * Load site values from database to fill a select list.
+ * https://developer.ebay.com/DevZone/merchandising/docs/Concepts/SiteIDToGlobalID.html
+ * @return [array] [description]
+ */
+function ebay_commerce_select_site() {
+
+  if(ebay_commerce_settings_check()){
+    $result = ebay_commerce_load_site();
+    $options = array();
     foreach ($result as $key => $record) {
       $options[$record->siteid] = $record->site;
     }
+  }else{
+    $options = array(
+     '0' => t('US'),
+     '146' => t('NL'),
+    );
+  }
   asort($options);
   return $options;
 }
 
 
 /**
+ * Load currency default for a select list.
+ * We want a default value in case the user has not yet made a connection eBay.
+ *
+ * @return [string] [Currency like EUR or USD]
+ */
+function ebay_commerce_default_currency() {
+  $default_currency = (EBAY_CURRENCY) ? EBAY_CURRENCY : 'USD';
+  return $default_currency;
+}
+
+/**
  * Load currency values from database to fill a select list.
  */
-function ebay_commerce_select_currency(){
+function ebay_commerce_select_currency() {
 
-  $result = ebay_commerce_load_currency();
-  $options = array();
+  if(ebay_commerce_settings_check()){
+    $result = ebay_commerce_load_currency();
+    $options = array();
     foreach ($result as $key => $record) {
       $options[strtoupper($record->currency)] = $record->description;
     }
+  }else{
+    $options = array(
+     'USD' => t('US Dollar'),
+     'EUR' => t('Euro'),
+    );
+  }
   asort($options);
   return $options;
+}
+
+
+/**
+ * Load country default for a select list.
+ * We want a default value in case the user has not yet made a connection eBay.
+ *
+ * @return [string] [Currency like NL or US]
+ */
+function ebay_commerce_default_country() {
+  $default_country = (EBAY_COUNTRY) ? EBAY_COUNTRY : 'US';
+  return $default_country;
 }
 
 
 /**
  * Load country values from database to fill a select list.
  */
-function ebay_commerce_select_country(){
+function ebay_commerce_select_country() {
 
-  $result = ebay_commerce_load_country();
-  $options = array();
+  if(ebay_commerce_settings_check()){
+    $result = ebay_commerce_load_country();
+    $options = array();
     foreach ($result as $key => $record) {
       $options[strtoupper($record->country)] = $record->description;
     }
+  }else{
+    $options = array(
+     'US' => t('United States'),
+     'NL' => t('Netherlands'),
+    );
+  }
   asort($options);
   return $options;
 }
+
+
+

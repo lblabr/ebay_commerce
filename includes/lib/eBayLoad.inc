@@ -22,7 +22,12 @@ class eBayLoad
         $response = $value->getElementsByTagName($this->_tagname);
       }
     }
+    if (isset($response)) {
      return $response;
+    }else{
+      drupal_set_message(t("No data received from eBay server."), 'status', FALSE);
+    }
+
   }
 
   public function eBayElement($id, $data) {

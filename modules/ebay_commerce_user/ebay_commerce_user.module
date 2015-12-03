@@ -42,7 +42,7 @@ function ebay_commerce_user_menu() {
 
 
 /**
- * Page callback sets up and returns the content for the Page Name page
+ * Page callback sets up and returns the content for the Page
  */
 function ebay_commerce_user_page_profile() {
 
@@ -51,27 +51,44 @@ function ebay_commerce_user_page_profile() {
   $module_path = drupal_get_path('module', 'ebay_commerce_user');
 
   // Add any required jQuery libraries JavaScript.
-  //drupal_add_js($module_path . '/theme/js/ebay_commerce_devel.js');
+  //drupal_add_js($module_path . '/theme/js/ebay_commerce_user.js');
 
   // Add the module path to Drupal.extend. DELETE IF UNNECESSARY!
   // http://dropbucket.org/node/32
   //$data = array(
-  //  'ebay_commerce_devel' => array (
+  //  'ebay_commerce_user' => array (
   //    'path' => $module_path,
   //  ),
   //);
   //drupal_add_js($data, 'setting');
 
   // Add the page CSS. DELETE IF UNNECESSARY!
-  //drupal_add_css($module_path . '/theme/css/ebay_commerce_devel.css');
+  //drupal_add_css($module_path . '/theme/css/ebay_commerce_user.css');
 
   // Render the theme function for this page
   // NOTE: Pass any required variables to theme function using array, see Drupal API.
 
   $ebay_commerce_user = ebay_commerce_get_user();
 
+  $ebay_commerce_user_settings = array(
+    'mode' => EBAY_MODE,
+    'api' => EBAY_API,
+    'site' => EBAY_SITE,
+    'currency' => EBAY_CURRENCY,
+    'language' => EBAY_ERROR_LANGUAGE,
+    'warning-level' => EBAY_WARNING_LEVEL,
+    'tracking' => EBAY_INVENTORY_TRACKING,
+    'developer-id' => EBAY_DEVELOPER_ID,
+    'application-id' => EBAY_APPLICATION_ID,
+    'cert-id' => EBAY_CERT_ID,
+    'url' => EBAY_SERVER_URL,
+    'token' => EBAY_USER_TOKEN,
+    'paypal' => EBAY_USER_PAYPAL,
+    );
+
   return theme('ebay_commerce_user', array (
     'ebay_user' => $ebay_commerce_user,
+    'ebay_user_settings' => $ebay_commerce_user_settings,
   ));
 
 }
@@ -85,14 +102,11 @@ function ebay_commerce_user_theme() {
       'variables' => array (
         // Specifies available variables.
        'ebay_user' => NULL,
+       'ebay_user_settings' => NULL,
       ),
-      // This allows you to create a tpl file commerce_discounts_main.tpl.php.
+      // This allows you to create a tpl file ebay_commerce_user_profile.tpl.php.
       // It will be automatically loaded by Drupal.
       'template' => 'ebay_commerce_user_profile',
     ),
   );
 }
-
-/**
- * Get use info from eBay.
- */

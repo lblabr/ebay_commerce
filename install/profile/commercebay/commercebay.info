@@ -27,6 +27,8 @@ dependencies[] = views
 ; Contribs development
 dependencies[] = admin_menu
 dependencies[] = admin_menu_toolbar
+dependencies[] = strongarm
 dependencies[] = devel
 dependencies[] = module_filter
 dependencies[] = coder_review
+dependencies[] = features
