@@ -1,19 +1,15 @@
 <?php
 
 /**
- * Test
+ * @file
+ * Installation profile for eBay Commerce.
  */
-function commercebay_preprocess_maintenance_page(&$variables) {
-
-}
-
 
 /**
- * Implements hook_form_alter().
+ * Implements hook_form_FORM_ID_alter().
  *
  * Allows the profile to alter the site configuration form.
  */
-
 function commercebay_form_install_configure_form_alter(&$form, $form_state) {
   // When using Drush, let it set the default password.
   if (drupal_is_cli()) {
@@ -41,15 +37,15 @@ function commercebay_form_install_configure_form_alter(&$form, $form_state) {
   $form['admin_account']['account']['commercebay_name'] = array(
     '#type' => 'item',
     '#title' => st('Username'),
-    '#markup' => 'admin'
+    '#markup' => 'admin',
   );
   $form['admin_account']['account']['commercebay_password'] = array(
     '#type' => 'item',
     '#title' => st('Password'),
-    '#markup' => 'admin'
+    '#markup' => 'admin',
   );
   $form['admin_account']['account']['commercebay_informations'] = array(
-    '#markup' => '<p>' . t('This information will be emailed to the store email address.') . '</p>'
+    '#markup' => '<p>' . t('This information will be emailed to the store email address.') . '</p>',
   );
   $form['admin_account']['override_account_informations'] = array(
     '#type' => 'checkbox',
@@ -83,16 +79,18 @@ function commercebay_form_install_configure_form_alter(&$form, $form_state) {
 }
 
 /**
- * Validate callback; Populate the admin account mail, user and password with
- * custom values.
+ * Validate callback.
+ *
+ * Populate the admin account mail, user and password
+ * with custom values.
  */
 function commercebay_custom_setting(&$form, &$form_state) {
   $form_state['values']['account']['mail'] = $form_state['values']['site_mail'];
   // Use our custom values only the corresponding checkbox is checked.
   if ($form_state['values']['override_account_informations'] == TRUE) {
-    if ($form_state['input']['pass']['pass1'] == $form_state['input']['pass']['pass2']) {
+    if ($form_state['values']['pass']['pass1'] == $form_state['values']['pass']['pass2']) {
       $form_state['values']['account']['name'] = $form_state['values']['name'];
-      $form_state['values']['account']['pass'] = $form_state['input']['pass']['pass1'];
+      $form_state['values']['account']['pass'] = $form_state['values']['pass']['pass1'];
     }
     else {
       form_set_error('pass', st('The specified passwords do not match.'));

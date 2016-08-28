@@ -8,13 +8,10 @@
  *
  * General utility variables:
  * - $variables: List all variables
- *
  */
 ?>
 
 <?php
-
-  dsm($variables);
 
  // Some shortcuts for easy editing and readability.
   $ebay_user = $variables['ebay_user'];

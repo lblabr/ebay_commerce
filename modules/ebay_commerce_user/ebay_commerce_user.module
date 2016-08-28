@@ -1,20 +1,17 @@
 <?php
 
 /**
- * eBay commerce user module.
- * Get user details from eBay.
- *
+ * @file
+ * EBay commerce user module.
  */
-
 
 /**
  * Implements hook_menu().
  */
-
 function ebay_commerce_user_menu() {
   $items = array();
 
-/* Development Menu */
+  /* Development Menu */
 
   $items['admin/ebay/user'] = array(
     'title' => 'User',
@@ -27,66 +24,43 @@ function ebay_commerce_user_menu() {
     'weight' => 49,
   );
 
-   $items['admin/ebay/user/profile'] = array(
-    'title' => t('Profile'),
-    'description' => t('Your eBay user details.'),
+  $items['admin/ebay/user/profile'] = array(
+    'title' => 'Profile',
+    'description' => 'Your eBay user details.',
     'page callback' => 'ebay_commerce_user_page_profile',
     'access arguments' => array('administer ebay'),
     'type' => MENU_NORMAL_ITEM,
-    'weight' => 1
+    'weight' => 1,
   );
 
   return $items;
 
 }
 
-
 /**
- * Page callback sets up and returns the content for the Page
+ * Page callback sets up and returns the content for the Page.
  */
 function ebay_commerce_user_page_profile() {
-
-  global $user;
-
-  $module_path = drupal_get_path('module', 'ebay_commerce_user');
-
-  // Add any required jQuery libraries JavaScript.
-  //drupal_add_js($module_path . '/theme/js/ebay_commerce_user.js');
-
-  // Add the module path to Drupal.extend. DELETE IF UNNECESSARY!
-  // http://dropbucket.org/node/32
-  //$data = array(
-  //  'ebay_commerce_user' => array (
-  //    'path' => $module_path,
-  //  ),
-  //);
-  //drupal_add_js($data, 'setting');
-
-  // Add the page CSS. DELETE IF UNNECESSARY!
-  //drupal_add_css($module_path . '/theme/css/ebay_commerce_user.css');
-
-  // Render the theme function for this page
-  // NOTE: Pass any required variables to theme function using array, see Drupal API.
 
   $ebay_commerce_user = ebay_commerce_get_user();
 
   $ebay_commerce_user_settings = array(
-    'mode' => EBAY_MODE,
-    'api' => EBAY_API,
-    'site' => EBAY_SITE,
-    'currency' => EBAY_CURRENCY,
-    'language' => EBAY_ERROR_LANGUAGE,
-    'warning-level' => EBAY_WARNING_LEVEL,
-    'tracking' => EBAY_INVENTORY_TRACKING,
-    'developer-id' => EBAY_DEVELOPER_ID,
-    'application-id' => EBAY_APPLICATION_ID,
-    'cert-id' => EBAY_CERT_ID,
-    'url' => EBAY_SERVER_URL,
-    'token' => EBAY_USER_TOKEN,
-    'paypal' => EBAY_USER_PAYPAL,
-    );
+    'mode' => EBAY_COMMERCE_MODE,
+    'api' => EBAY_COMMERCE_API,
+    'site' => EBAY_COMMERCE_SITE,
+    'currency' => EBAY_COMMERCE_CURRENCY,
+    'language' => EBAY_COMMERCE_ERROR_LANGUAGE,
+    'warning-level' => EBAY_COMMERCE_WARNING_LEVEL,
+    'tracking' => EBAY_COMMERCE_INVENTORY_TRACKING,
+    'developer-id' => EBAY_COMMERCE_DEVELOPER_ID,
+    'application-id' => EBAY_COMMERCE_APPLICATION_ID,
+    'cert-id' => EBAY_COMMERCE_CERT_ID,
+    'url' => EBAY_COMMERCE_SERVER_URL,
+    'token' => EBAY_COMMERCE_USER_TOKEN,
+    'paypal' => EBAY_COMMERCE_USER_PAYPAL,
+  );
 
-  return theme('ebay_commerce_user', array (
+  return theme('ebay_commerce_user', array(
     'ebay_user' => $ebay_commerce_user,
     'ebay_user_settings' => $ebay_commerce_user_settings,
   ));
@@ -94,18 +68,18 @@ function ebay_commerce_user_page_profile() {
 }
 
 /**
- * Implements hook_theme.
+ * Implements hook_theme().
  */
 function ebay_commerce_user_theme() {
-  return array (
-    'ebay_commerce_user' => array (
-      'variables' => array (
+  return array(
+    'ebay_commerce_user' => array(
+      'variables' => array(
         // Specifies available variables.
-       'ebay_user' => NULL,
-       'ebay_user_settings' => NULL,
+        'ebay_user' => NULL,
+        'ebay_user_settings' => NULL,
       ),
-      // This allows you to create a tpl file ebay_commerce_user_profile.tpl.php.
-      // It will be automatically loaded by Drupal.
+      // This allows you to create a tpl file
+      // ebay_commerce_user_profile.tpl.php.
       'template' => 'ebay_commerce_user_profile',
     ),
   );

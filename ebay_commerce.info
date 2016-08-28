@@ -4,9 +4,9 @@ package = eBay
 core = 7.x
 
 ; Module includes
-files[] = includes/lib/eBaySession.inc
-files[] = includes/lib/eBayLoad.inc
-files[] = includes/lib/eBayUser.inc
+files[] = includes/lib/EbayCommerceSession.inc
+files[] = includes/lib/EbayCommerceLoad.inc
+files[] = includes/lib/EbayCommerceUser.inc
 
 ; Simple tests
 files[] = test/ebay_commerce.test

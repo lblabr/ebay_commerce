@@ -1,7 +1,8 @@
 <?php
+
 /**
  * @file
- * Install, update and uninstall functions for the eBay Commerce installation profile.
+ * Installation functions for eBay Commerce profile.
  */
 
 /**
@@ -25,7 +26,8 @@ function commercebay_install() {
   variable_set('admin_theme', 'seven');
   variable_set('node_admin_theme', '1');
 
-  // Create a default role for site administrators, with all available permissions assigned.
+  // Create a default role for site administrators,
+  // with all available permissions assigned.
   $admin_role = new stdClass();
   $admin_role->name = 'administrator';
   $admin_role->weight = 2;

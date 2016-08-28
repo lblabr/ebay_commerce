@@ -2,14 +2,12 @@
 
 /**
  * @file
- *
  * User interface for commerce eBay module.
- *
  */
+
 /**
  * Implements hook_menu().
  */
-
 function ebay_commerce_ui_menu() {
   $items = array();
 
@@ -28,20 +26,20 @@ function ebay_commerce_ui_menu() {
     'title' => 'Settings',
     'description' => 'Configuration and credentials for eBay.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ebay_commerce_settings_form'),
+    'page arguments' => array('ebay_commerce_ui_settings_form'),
     'access arguments' => array('administer ebay'),
     'file' => 'includes/ebay_commerce_settings.inc',
-    'weight' => 1
+    'weight' => 1,
   );
 
   $items['admin/ebay/settings/common'] = array(
     'title' => 'Settings',
     'description' => 'Settings',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ebay_commerce_settings_form'),
+    'page arguments' => array('ebay_commerce_ui_settings_form'),
     'access arguments' => array('administer ebay'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => 2
+    'weight' => 2,
   );
 
   $items['admin/ebay/settings/production'] = array(
@@ -52,7 +50,7 @@ function ebay_commerce_ui_menu() {
     'access arguments' => array('administer ebay'),
     'file' => 'includes/ebay_commerce_settings_production.inc',
     'type' => MENU_LOCAL_TASK,
-    'weight' => 3
+    'weight' => 3,
   );
 
   $items['admin/ebay/settings/sandbox'] = array(
@@ -63,7 +61,7 @@ function ebay_commerce_ui_menu() {
     'access arguments' => array('administer ebay'),
     'file' => 'includes/ebay_commerce_settings_sandbox.inc',
     'type' => MENU_LOCAL_TASK,
-    'weight' => 3
+    'weight' => 3,
   );
 
   return $items;

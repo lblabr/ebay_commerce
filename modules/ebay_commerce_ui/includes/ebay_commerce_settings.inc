@@ -1,17 +1,16 @@
 <?php
 
 /**
+ * @file
  * Building the form for the ebay setting page.
  */
 
-function ebay_commerce_settings_form() {
-
 /**
- * This is to specify the vertical tab holder.
- * One page can have two vertical tabs, but it's always one main tab with sub tabs.
+ * Implements hook_form().
  */
-
-  $form['settingsform'] = array(
+function ebay_commerce_ui_settings_form() {
+  // Vertical tab holder.
+  $form['ebay_commerce_ui_settings'] = array(
     '#type' => 'vertical_tabs',
   );
 
@@ -19,34 +18,38 @@ function ebay_commerce_settings_form() {
     drupal_get_path('module', 'ebay_commerce_ui') . '/includes/css/ebay_commerce_settings.css',
   );
 
-  /* FIRST FIELDSET. */
+  // First field set.
   $form['first'] = array(
     '#type' => 'fieldset',
     '#title' => 'Basic',
     '#collapsible' => TRUE,
-    '#description' => '',
-    '#group' => 'settingsform'
+    '#description' => t('Basic'),
+    '#group' => 'ebay_commerce_ui_settings',
+  );
+  $form['first'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Enter your other details below'),
+    '#description' => t('These are all optional'),
   );
 
   // Select eBay Mode Sandbox or Production.
-  $form['first']['ebay_settings_mode'] = array(
+  $form['first']['ebay_commerce_ui_mode'] = array(
     '#type' => 'select',
     '#title' => 'Ebay Mode',
-    '#default_value' => variable_get('ebay_settings_mode'),
+    '#description' => t('Sandbox or production mode.'),
+    '#default_value' => EBAY_COMMERCE_MODE,
     '#options' => array(
       'sandbox' => t('Sandbox'),
       'production' => t('Production'),
-     ),
-    '#ajax' => array(
-      'callback' => 'ebay_admin_settings_ajax_callback_mode',
-     ),
+    ),
   );
 
-  // Select eBay API version
-  $form['first']['ebay_settings_api'] = array(
+  // Select eBay API version.
+  $form['first']['ebay_commerce_ui_api'] = array(
     '#type' => 'select',
     '#title' => 'API version',
-    '#default_value' => variable_get('ebay_settings_api'),
+    '#description' => t('eBay API version to use.'),
+    '#default_value' => EBAY_COMMERCE_API,
     '#options' => array(
       '841' => t('841'),
       '845' => t('845'),
@@ -57,304 +60,268 @@ function ebay_commerce_settings_form() {
       '945' => t('945'),
     ),
     '#ajax' => array(
-      'callback' => 'ebay_admin_settings_ajax_callback_api',
+      'callback' => 'ebay_commerce_ui_ajax_callback_api',
     ),
   );
 
-  // Select Site ID
-  $form['first']['ebay_settings_site_id'] = array(
+  // Select Site ID.
+  $form['first']['ebay_commerce_ui_site_id'] = array(
     '#type' => 'select',
     '#title' => 'Default Site ID',
-    '#description' => 'The eBay site you want to upload to.',
-    '#default_value' => ebay_commerce_default_site(),
+    '#description' => t('The eBay site you want to upload to.'),
+    '#default_value' => EBAY_COMMERCE_SITE,
     '#options' => ebay_commerce_select_site(),
     '#ajax' => array(
-      'callback' => 'ebay_admin_settings_ajax_callback_site_id',
+      'callback' => 'ebay_commerce_ui_ajax_callback_site_id',
     ),
   );
 
-  // Select Default Currency Settings
-  $form['first']['ebay_settings_currency'] = array(
-  '#type' => 'select',
-  '#title' => 'Default currency',
-  '#description' => 'The currency should match the site.',
-  '#default_value' => ebay_commerce_default_currency(),
-  '#options' => ebay_commerce_select_currency(),
-  '#ajax' => array(
-    'callback' => 'ebay_admin_settings_ajax_callback_currency',
-   ),
+  // Select Default Currency Settings.
+  $form['first']['ebay_commerce_ui_currency'] = array(
+    '#type' => 'select',
+    '#title' => 'Default currency',
+    '#description' => t('The currency should match the site.'),
+    '#default_value' => EBAY_COMMERCE_CURRENCY,
+    '#options' => ebay_commerce_select_currency(),
+    '#ajax' => array(
+      'callback' => 'ebay_commerce_ui_ajax_callback_currency',
+    ),
   );
 
-  // Select Country
-  $form['first']['ebay_settings_country'] = array(
+  // Select Country.
+  $form['first']['ebay_commerce_ui_country'] = array(
     '#type' => 'select',
     '#title' => 'Your country',
-    '#description' => 'The country your operating from.',
-    '#default_value' => ebay_commerce_default_country(),
+    '#description' => t('The country your operating from.'),
+    '#default_value' => EBAY_COMMERCE_COUNTRY,
     '#options' => ebay_commerce_select_country(),
     '#ajax' => array(
-      'callback' => 'ebay_admin_settings_ajax_callback_country',
+      'callback' => 'ebay_commerce_ui_ajax_callback_country',
     ),
   );
 
-  // Select Error Language
-  $form['first']['ebay_settings_errorlanguage'] = array(
+  // Select Error Language.
+  $form['first']['ebay_commerce_ui_error_language'] = array(
     '#type' => 'select',
-    '#title' => 'ErrorLanguage',
-    '#default_value' => variable_get('ebay_settings_errorlanguage'),
+    '#title' => 'Error language',
+    '#description' => t('The language to display the errors in.'),
+    '#default_value' => EBAY_COMMERCE_ERROR_LANGUAGE,
     '#options' => array(
       'en_US' => t('en_US'),
       'nl_NL' => t('nl_NL'),
-     ),
+    ),
     '#ajax' => array(
-        'callback' => 'ebay_admin_settings_ajax_callback_errorlanguage',
-     ),
+      'callback' => 'ebay_commerce_ui_ajax_callback_error_language',
+    ),
   );
 
-  // Select warninglevel
-  $form['first']['ebay_settings_warninglevel'] = array(
+  // Select warning level.
+  $form['first']['ebay_commerce_ui_warning_level'] = array(
     '#type' => 'select',
-    '#title' => 'WarningLevel',
-    '#default_value' => variable_get('ebay_settings_warninglevel'),
+    '#title' => 'Warning level',
+    '#description' => t('The warning level.'),
+    '#default_value' => EBAY_COMMERCE_WARNING_LEVEL,
     '#options' => array(
       'High' => t('High'),
       'Low' => t('Low'),
     ),
     '#ajax' => array(
-        'callback' => 'ebay_admin_settings_ajax_callback_warninglevel',
-     ),
+      'callback' => 'ebay_commerce_ui_ajax_callback_warning_level',
+    ),
   );
 
-  // Select InventoryTrackingMethod
-  $form['first']['ebay_settings_inventory_tracking'] = array(
+  // Select Inventory tracking method.
+  $form['first']['ebay_commerce_ui_inventory_tracking'] = array(
     '#type' => 'select',
     '#title' => 'Inventory Tracking',
-    '#default_value' => variable_get('ebay_settings_inventory_tracking'),
+    '#description' => t('How u want eBay to track your products.'),
+    '#default_value' => EBAY_COMMERCE_INVENTORY_TRACKING,
     '#options' => array(
-    'ItemID' => t('eBay-objectnumber'),
-    'SKU' => t('SKU'),
+      'ItemID' => t('eBay-objectnumber'),
+      'SKU' => t('SKU'),
     ),
     '#ajax' => array(
-        'callback' => 'ebay_admin_settings_ajax_callback_inventory_tracking',
-     ),
+      'callback' => 'ebay_commerce_ui_ajax_callback_inventory_tracking',
+    ),
   );
 
-  // Select Condition
-  $form['first']['ebay_settings_condition_id'] = array(
-  '#type' => 'select',
-  '#title' =>'Condition',
-  '#default_value' => variable_get('ebay_settings_condition_id'),
-  '#options' => array(
-    '1000' => t('New'),
-    '1500' => t('New other (see details)'),
-    '1750' => t('New with defects'),
-    '2000' => t('Manufacturer refurbished'),
-    '2500' => t('Seller refurbished'),
-    '3000' => t('Used'),
-    '4000' => t('Very Good'),
-    '5000' => t('Good'),
-    '6000' => t('Acceptable'),
-    '7000' => t('For parts or not working'),
-  ),
-  '#ajax' => array(
-      'callback' => 'ebay_admin_settings_ajax_callback_condition_id',
-   ),
+  // Select Condition.
+  $form['first']['ebay_commerce_ui_condition_id'] = array(
+    '#type' => 'select',
+    '#title' => 'Condition',
+    '#description' => t('The default product condition.'),
+    '#default_value' => EBAY_COMMERCE_CONDITION,
+    '#options' => array(
+      '1000' => t('New'),
+      '1500' => t('New other (see details)'),
+      '1750' => t('New with defects'),
+      '2000' => t('Manufacturer refurbished'),
+      '2500' => t('Seller refurbished'),
+      '3000' => t('Used'),
+      '4000' => t('Very Good'),
+      '5000' => t('Good'),
+      '6000' => t('Acceptable'),
+      '7000' => t('For parts or not working'),
+    ),
+    '#ajax' => array(
+      'callback' => 'ebay_commerce_ui_ajax_callback_condition_id',
+    ),
   );
 
-  $form['#submit'][] = 'ebay_admin_settings_submit'; //Submit button call back.
+  // Submit button call back.
+  $form['#submit'][] = 'ebay_commerce_ui_settings_submit';
 
   return system_settings_form($form);
 
 }
 
-
-
 /**
  * Logic behind the form submit.
  */
-
-function ebay_admin_settings_submit($form, $form_state) {
+function ebay_commerce_ui_settings_submit($form, $form_state) {
   // code.
 }
 
-
 /**
- * eBay Mode submit.
+ * EBay Mode submit.
  */
-
-function ebay_admin_settings_ajax_callback_mode($form, $form_state) {
-  variable_set('ebay_settings_mode', $form_state['values']['ebay_settings_mode']);
+function ebay_commerce_ui_ajax_callback_mode($form, $form_state) {
+  variable_set('ebay_commerce_ui_mode', $form_state['values']['ebay_commerce_ui_mode']);
 }
 
 /**
- * eBay API submit.
+ * EBay API submit.
  */
-
-function ebay_admin_settings_ajax_callback_api($form, $form_state) {
-  variable_set('ebay_settings_api', $form_state['values']['ebay_settings_api']);
+function ebay_commerce_ui_ajax_callback_api($form, $form_state) {
+  variable_set('ebay_commerce_ui_api', $form_state['values']['ebay_commerce_ui_api']);
 }
 
 /**
- * eBay Site ID submit.
+ * EBay Site ID submit.
  */
-
-function ebay_admin_settings_ajax_callback_site_id($form, $form_state) {
-  variable_set('ebay_settings_site_id', $form_state['values']['ebay_settings_site_id']);
+function ebay_commerce_ui_ajax_callback_site_id($form, $form_state) {
+  variable_set('ebay_commerce_ui_site_id', $form_state['values']['ebay_commerce_ui_site_id']);
 }
 
 /**
- * eBay Currency submit.
+ * EBay Currency submit.
  */
-
-function ebay_admin_settings_ajax_callback_currency($form, $form_state) {
-  variable_set('ebay_settings_currency', $form_state['values']['ebay_settings_currency']);
+function ebay_commerce_ui_ajax_callback_currency($form, $form_state) {
+  variable_set('ebay_commerce_ui_currency', $form_state['values']['ebay_commerce_ui_currency']);
 }
 
 /**
- * eBay country submit.
+ * EBay country submit.
  */
-
-function ebay_admin_settings_ajax_callback_country($form, $form_state) {
-  variable_set('ebay_settings_country',$form_state['values']['ebay_settings_country']);
-}
-
-
-/**
- * eBay Errorlanguage submit.
- */
-
-function ebay_admin_settings_ajax_callback_errorlanguage($form, $form_state) {
-  variable_set('ebay_settings_errorlanguage', $form_state['values']['ebay_settings_errorlanguage']);
+function ebay_commerce_ui_ajax_callback_country($form, $form_state) {
+  variable_set('ebay_commerce_ui_country', $form_state['values']['ebay_commerce_ui_country']);
 }
 
 /**
- * eBay Warninglevel submit.
+ * EBay error language submit.
  */
-
-function ebay_admin_settings_ajax_callback_warninglevel($form, $form_state) {
-  variable_set('ebay_settings_warninglevel', $form_state['values']['ebay_settings_warninglevel']);
+function ebay_commerce_ui_ajax_callback_error_language($form, $form_state) {
+  variable_set('ebay_commerce_ui_error_language', $form_state['values']['ebay_commerce_ui_error_language']);
 }
 
 /**
- * eBay InventoryTrackingMethod submit.
+ * EBay Warning level submit.
  */
-
-function ebay_admin_settings_ajax_callback_inventory_tracking($form, $form_state) {
-  variable_set('ebay_settings_inventory_tracking', $form_state['values']['ebay_settings_inventory_tracking']);
+function ebay_commerce_ui_ajax_callback_warning_level($form, $form_state) {
+  variable_set('ebay_commerce_ui_warning_level', $form_state['values']['ebay_commerce_ui_warning_level']);
 }
 
-
 /**
- * eBay Condition_id.
+ * EBay InventoryTrackingMethod submit.
  */
-
-function ebay_admin_settings_ajax_callback_condition_id($form, $form_state) {
-  variable_set('ebay_settings_condition_id', $form_state['values']['ebay_settings_condition_id']);
+function ebay_commerce_ui_ajax_callback_inventory_tracking($form, $form_state) {
+  variable_set('ebay_commerce_ui_inventory_tracking', $form_state['values']['ebay_commerce_ui_inventory_tracking']);
 }
 
+/**
+ * EBay Condition_id.
+ */
+function ebay_commerce_ui_ajax_callback_condition_id($form, $form_state) {
+  variable_set('ebay_commerce_ui_condition_id', $form_state['values']['ebay_commerce_ui_condition_id']);
+}
 
 /**
- * Load site default for a select list.
- * We want a default value in case the user has not yet made a connection eBay. *
- * https://developer.ebay.com/DevZone/merchandising/docs/Concepts/SiteIDToGlobalID.html
+ * Select sites.
  *
- * @return [string] [eBay Site ID]
- */
-function ebay_commerce_default_site() {
-  $default_site = (EBAY_SITE) ? EBAY_SITE : '0'; // Default = US
-  return $default_site;
-}
-
-
-/**
- * Load site values from database to fill a select list.
- * https://developer.ebay.com/DevZone/merchandising/docs/Concepts/SiteIDToGlobalID.html
- * @return [array] [description]
+ * @return array
+ *   list of sites.
  */
 function ebay_commerce_select_site() {
 
-  if(ebay_commerce_settings_check()){
-    $result = ebay_commerce_load_site();
-    $options = array();
-    foreach ($result as $key => $record) {
-      $options[$record->siteid] = $record->site;
+  if (module_exists('ebay_commerce_loader')) {
+    if (ebay_commerce_settings_check()) {
+      $result = ebay_commerce_load_site();
+      $options = array();
+      foreach ($result as $record) {
+        $options[$record->siteid] = $record->site;
+      }
     }
-  }else{
+  }
+  else {
     $options = array(
-     '0' => t('US'),
-     '146' => t('NL'),
+      '0' => t('US'),
+      '146' => t('NL'),
     );
   }
   asort($options);
   return $options;
 }
 
-
 /**
- * Load currency default for a select list.
- * We want a default value in case the user has not yet made a connection eBay.
+ * Select currency.
  *
- * @return [string] [Currency like EUR or USD]
- */
-function ebay_commerce_default_currency() {
-  $default_currency = (EBAY_CURRENCY) ? EBAY_CURRENCY : 'USD';
-  return $default_currency;
-}
-
-/**
- * Load currency values from database to fill a select list.
+ * @return array
+ *   List of currencies.
  */
 function ebay_commerce_select_currency() {
 
-  if(ebay_commerce_settings_check()){
-    $result = ebay_commerce_load_currency();
-    $options = array();
-    foreach ($result as $key => $record) {
-      $options[strtoupper($record->currency)] = $record->description;
+  if (module_exists('ebay_commerce_loader')) {
+    if (ebay_commerce_settings_check()) {
+      $result = ebay_commerce_load_currency();
+      $options = array();
+      foreach ($result as $record) {
+        $options[strtoupper($record->currency)] = $record->description;
+      }
     }
-  }else{
+  }
+  else {
     $options = array(
-     'USD' => t('US Dollar'),
-     'EUR' => t('Euro'),
+      'USD' => t('US Dollar'),
+      'EUR' => t('Euro'),
     );
   }
   asort($options);
   return $options;
 }
 
-
 /**
- * Load country default for a select list.
- * We want a default value in case the user has not yet made a connection eBay.
+ * Select country.
  *
- * @return [string] [Currency like NL or US]
- */
-function ebay_commerce_default_country() {
-  $default_country = (EBAY_COUNTRY) ? EBAY_COUNTRY : 'US';
-  return $default_country;
-}
-
-
-/**
- * Load country values from database to fill a select list.
+ * @return array
+ *   List of countries.
  */
 function ebay_commerce_select_country() {
 
-  if(ebay_commerce_settings_check()){
-    $result = ebay_commerce_load_country();
-    $options = array();
-    foreach ($result as $key => $record) {
-      $options[strtoupper($record->country)] = $record->description;
+  if (module_exists('ebay_commerce_loader')) {
+    if (ebay_commerce_settings_check()) {
+      $result = ebay_commerce_load_country();
+      $options = array();
+      foreach ($result as $record) {
+        $options[strtoupper($record->country)] = $record->description;
+      }
     }
-  }else{
+  }
+  else {
     $options = array(
-     'US' => t('United States'),
-     'NL' => t('Netherlands'),
+      'US' => t('United States'),
+      'NL' => t('Netherlands'),
     );
   }
   asort($options);
   return $options;
 }
-
-
-

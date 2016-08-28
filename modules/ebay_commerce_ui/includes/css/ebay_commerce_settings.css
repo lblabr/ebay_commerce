@@ -1,14 +1,12 @@
-.form-item{
+.form-item {
   width: 20%;
 }
 
 select {
-    padding: 2px;
-    border: 1px solid #ccc;
-    border-top-color: #999;
-    background: #fff;
-    color: #333;
-    width: 160px;
+  padding: 2px;
+  border: 1px solid #ccc;
+  border-top-color: #999;
+  background: #fff;
+  color: #333;
+  width: 160px;
 }
-
-

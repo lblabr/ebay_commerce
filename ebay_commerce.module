@@ -2,117 +2,118 @@
 
 /**
  * @file
- * eBay commerce module.
- *
+ * EBay commerce module.
  */
-
 
 /**
  * Implements hook_permission().
  */
-
 function ebay_commerce_permission() {
 
   return array(
     'administer ebay' => array(
-    'title' => t('Administer ebay'),
-    'description' => t('Administer ebay settings'),
+      'title' => t('Administer ebay'),
+      'description' => t('Administer ebay settings'),
     ),
 
     'end ebay items' => array(
-    'title' => t('End ebay items'),
-    'description' => t('Allow users to end ebay items'),
+      'title' => t('End ebay items'),
+      'description' => t('Allow users to end ebay items'),
     ),
 
     'post ebay items' => array(
-    'title' => t('Post ebay items'),
-    'description' => t('Allow users to post ebay items'),
+      'title' => t('Post ebay items'),
+      'description' => t('Allow users to post ebay items'),
     ),
   );
 
 }
 
-
 /**
- *  Define constants
+ * Define constants.
  *
  * We store user data in variables for easy development.
  * Should be be secured, could use encryption module.
  * https://www.drupal.org/project/aes
  * https://www.drupal.org/project/encrypt
  * Or store values in settings.php
- * using `$conf['ebay_admin_sandbox_user_id'] = 'TESTUSER_yourname';`
+ * using `$conf['ebay_commerce_ui_sandbox_user_id'] = 'TESTUSER_yourname';`
  *
  * TODO : Secure user credentials.
- *
  */
 
-  define('EBAY_MODE', variable_get('ebay_settings_mode'));
-  define('EBAY_API', variable_get('ebay_settings_api'));
-  define('EBAY_SITE', variable_get('ebay_settings_site_id'));
-  define('EBAY_CURRENCY', variable_get('ebay_settings_currency'));
-  define('EBAY_COUNTRY', variable_get('ebay_settings_country'));
-  define('EBAY_ERROR_LANGUAGE', variable_get('ebay_settings_errorlanguage'));
-  define('EBAY_WARNING_LEVEL', variable_get('ebay_settings_warninglevel'));
-  define('EBAY_INVENTORY_TRACKING', variable_get('ebay_settings_inventory_tracking'));
-  define('EBAY_CONDITION', variable_get('ebay_settings_condition_id'));
+define('EBAY_COMMERCE_MODE', variable_get('ebay_commerce_ui_mode', 'sandbox'));
+define('EBAY_COMMERCE_API', variable_get('ebay_commerce_ui_api', '841'));
+define('EBAY_COMMERCE_SITE', variable_get('ebay_commerce_ui_site_id', '0'));
+define('EBAY_COMMERCE_CURRENCY', variable_get('ebay_commerce_ui_currency', 'USD'));
+define('EBAY_COMMERCE_COUNTRY', variable_get('ebay_commerce_ui_country', 'US'));
+define('EBAY_COMMERCE_ERROR_LANGUAGE', variable_get('ebay_commerce_ui_error_language'), 'en_US');
+define('EBAY_COMMERCE_WARNING_LEVEL', variable_get('ebay_commerce_ui_warning_level', 'High'));
+define('EBAY_COMMERCE_INVENTORY_TRACKING', variable_get('ebay_commerce_ui_inventory_tracking', 'ItemID'));
+define('EBAY_COMMERCE_CONDITION', variable_get('ebay_commerce_ui_condition_id', '1000'));
 
-  // Check Mode Sandbox Or Production
-  if (EBAY_MODE == 'production') {
-    // production environment
-    define('EBAY_USER_ID', variable_get('ebay_user_id'));
-    define('EBAY_DEVELOPER_ID', variable_get('ebay_admin_production_dev_id'));
-    define('EBAY_APPLICATION_ID', variable_get('ebay_admin_production_app_id'));
-    define('EBAY_CERT_ID', variable_get('ebay_admin_production_cert_id'));
-    define('EBAY_SERVER_URL', variable_get('ebay_admin_production_url'));
-    define('EBAY_USER_TOKEN', variable_get('ebay_admin_production_usertoken'));
-    define('EBAY_USER_PAYPAL', variable_get('ebay_admin_production_paypal_id'));
-  }
-  else {
-  // sandbox (test) environment
-    define('EBAY_USER_ID', variable_get('ebay_admin_sandbox_user_id'));
-    define('EBAY_DEVELOPER_ID', variable_get('ebay_admin_sandbox_dev_id'));
-    define('EBAY_APPLICATION_ID', variable_get('ebay_admin_sandbox_app_id'));
-    define('EBAY_CERT_ID', variable_get('ebay_admin_sandbox_cert_id'));
-    define('EBAY_SERVER_URL', variable_get('ebay_admin_sandbox_url'));
-    define('EBAY_USER_TOKEN', variable_get('ebay_admin_sandbox_usertoken'));
-    define('EBAY_USER_PAYPAL', variable_get('ebay_admin_sandbox_paypal_id'));
-  }
-
+// Check Mode Sandbox Or Production.
+if (EBAY_COMMERCE_MODE == 'production') {
+  // Production environment.
+  define('EBAY_COMMERCE_USER_ID', variable_get('ebay_commerce_ui_user_id'));
+  define('EBAY_COMMERCE_DEVELOPER_ID', variable_get('ebay_commerce_ui_dev_id'));
+  define('EBAY_COMMERCE_APPLICATION_ID', variable_get('ebay_commerce_ui_app_id'));
+  define('EBAY_COMMERCE_CERT_ID', variable_get('ebay_commerce_ui_cert_id'));
+  define('EBAY_COMMERCE_SERVER_URL', variable_get('ebay_commerce_ui_url', 'https://api.ebay.com/ws/api.dll'));
+  define('EBAY_COMMERCE_USER_TOKEN', variable_get('ebay_commerce_ui_user_token'));
+  define('EBAY_COMMERCE_USER_PAYPAL', variable_get('ebay_commerce_ui_paypal_id'));
+}
+else {
+  // Sandbox (test) environment.
+  define('EBAY_COMMERCE_USER_ID', variable_get('ebay_commerce_ui_sandbox_user_id'));
+  define('EBAY_COMMERCE_DEVELOPER_ID', variable_get('ebay_commerce_ui_sandbox_dev_id'));
+  define('EBAY_COMMERCE_APPLICATION_ID', variable_get('ebay_commerce_ui_sandbox_app_id'));
+  define('EBAY_COMMERCE_CERT_ID', variable_get('ebay_commerce_ui_sandbox_cert_id'));
+  define('EBAY_COMMERCE_SERVER_URL', variable_get('ebay_commerce_ui_sandbox_url', 'https://api.sandbox.ebay.com/ws/api.dll'));
+  define('EBAY_COMMERCE_USER_TOKEN', variable_get('ebay_commerce_ui_sandbox_user_token'));
+  define('EBAY_COMMERCE_USER_PAYPAL', variable_get('ebay_commerce_ui_sandbox_paypal_id'));
+}
 
 /**
- * Check if all user settings are available before
- * making a connecting to ebay.
- * @return [Boolean] [True or False]
+ * Ebay commerce settings check.
+ *
+ * We need to make sure all settings are available
+ * before making a connection to ebay.
+ *
+ * @return True|False
+ *   returns true if all values are available.
  */
 function ebay_commerce_settings_check() {
 
-  //Set the values we want to check.
+  // Set the values we want to check.
   $items = array(
-    EBAY_USER_ID,
-    EBAY_DEVELOPER_ID,
-    EBAY_APPLICATION_ID,
-    EBAY_CERT_ID,
-    EBAY_SERVER_URL,
-    EBAY_USER_TOKEN,
-    EBAY_USER_PAYPAL
+    EBAY_COMMERCE_USER_ID,
+    EBAY_COMMERCE_DEVELOPER_ID,
+    EBAY_COMMERCE_APPLICATION_ID,
+    EBAY_COMMERCE_CERT_ID,
+    EBAY_COMMERCE_SERVER_URL,
+    EBAY_COMMERCE_USER_TOKEN,
+    EBAY_COMMERCE_USER_PAYPAL,
   );
 
   foreach ($items as $value) {
     if (!$value) {
+      drupal_set_message(t("Please configure all settings/credentials before making a connection to eBay."), 'warning', FALSE);
       return FALSE;
     }
   }
+
   return TRUE;
-
 }
-
 
 /**
  * Checks for errors returned by eBay.
  *
- * @param  [DOMNodeList] $response [Xml data returned by eBay.]
- * @return [Boolean] [True or False]
+ * @param DOMNode|DOMElement $response
+ *    Xml data returned by eBay.
+ *
+ * @return Boolean [True or False]
+ *    returns FALSE is no errors were found.
  *
  * @code
  * $error = ebay_commerce_error_check($response_doc);
@@ -126,18 +127,19 @@ function ebay_commerce_settings_check() {
 function ebay_commerce_error_check($response) {
 
   if ($response) {
+    /** @var DOMElement|DOMNodeList $errors */
     $errors = $response->getElementsByTagName('Errors');
 
     if ($errors->length > 0) {
 
-      //Get error code, ShortMesaage and LongMessage
+      // Get error code, ShortMessage and LongMessage.
       $code = $errors->item(0)->getElementsByTagName('ErrorCode');
       $short = $errors->item(0)->getElementsByTagName('ShortMessage');
       $long = $errors->item(0)->getElementsByTagName('LongMessage');
 
       $url = 'http://developer.ebay.com/devzone/xml/docs/reference/ebay/errors/errormessages.htm';
 
-      //Display code and shortmessage
+      // Display code and short message.
       $msg  = 'There were errors: <b>' . $short->item(0)->nodeValue . '</b></br>';
       $msg .= 'eBay returned: <b>ErrorCode ' . $code->item(0)->nodeValue . '</b></br>';
       $msg .= 'eBay returned the following Message: <b>' . $long->item(0)->nodeValue . '</b></br>';
@@ -147,72 +149,75 @@ function ebay_commerce_error_check($response) {
     }
   }
   return FALSE;
-} // End function
+}
 
 /**
- * [ebay_commerce_action creates a call/action to eBay]
- * @param  [string] $action [The eBay action u want to use like GeteBayOfficialTime.]
- * @param  [xml] $xml [defaults to NULL]
- * @return [DOMNodeList|FALSE]         [description]
+ * Creates a call/action to eBay.
+ *
+ * @param string $action
+ *   The eBay action u want to use like GeteBayOfficialTime.
+ * @param string $xml
+ *   defaults to NULL.
+ *
+ * @return DOMNodeList|false
+ *    description.
  */
+function ebay_commerce_action($action, $xml = NULL) {
 
-function ebay_commerce_action($action , $xml = NULL) {
-
-  if(ebay_commerce_settings_check()) {
+  if (ebay_commerce_settings_check()) {
     $request = $action . 'Request';
     $response = $action . 'Response';
 
-    // Build XML data and POST it to eBay
-
-    //Build the request Xml string
+    // Build XML data and we want to send to eBay.
     $xml_body = '<?xml version="1.0" encoding="utf-8"?>';
     $xml_body .= '<' . $request . ' xmlns="urn:ebay:apis:eBLBaseComponents">';
-    $xml_body .= '<RequesterCredentials><eBayAuthToken>' . EBAY_USER_TOKEN . '</eBayAuthToken></RequesterCredentials>';
-    $xml_body .= '<ErrorLanguage>' . EBAY_ERROR_LANGUAGE . '</ErrorLanguage>';
-    $xml_body .= '<WarningLevel>' . EBAY_WARNING_LEVEL . '</WarningLevel>';
+    $xml_body .= '<RequesterCredentials><eBayAuthToken>' . EBAY_COMMERCE_USER_TOKEN . '</eBayAuthToken></RequesterCredentials>';
+    $xml_body .= '<ErrorLanguage>' . EBAY_COMMERCE_ERROR_LANGUAGE . '</ErrorLanguage>';
+    $xml_body .= '<WarningLevel>' . EBAY_COMMERCE_WARNING_LEVEL . '</WarningLevel>';
     $xml_body .= $xml;
     $xml_body .= '</' . $request . '>';
 
-    //dsm($xml_body);
+    // Create a new eBay session.
+    $session = new EbayCommerceSession($action);
 
-    //Create a new eBay session
-    $session = new eBaySession( $action );
-
-    // send the request and get response
+    // Send the request and get response.
     $response_xml = $session->sendHttpRequest($xml_body);
 
-    // if no connection possible end request.
+    // If no connection possible end request.
     if (stristr($response_xml, 'HTTP 404') || $response_xml == '') {
       drupal_set_message(t('Error sending request'), 'error');
       return FALSE;
     }
 
-    // Xml string is parsed and creates a DOM Document object
+    // Xml string is parsed and creates a DOM Document object.
     $response_doc = new DomDocument();
     $response_doc->loadXML($response_xml);
 
-    // Error check
+    // Error check.
     $error = ebay_commerce_error_check($response_doc);
     if ($error) {
-      drupal_set_message(t($error), 'error');
+      drupal_set_message(check_plain($error), 'error');
       return FALSE;
-    }else{
+    }
+    else {
       $responses = $response_doc->getElementsByTagName($response);
       return $responses;
     }
   }
-  return FALSE;
-} // End function
-
+  else {
+    drupal_goto("admin/ebay/settings");
+    exit;
+  }
+}
 
 /**
  * Get time from the eBay server.
  *
- * Can alse be used to check for connection with eBay server
+ * Can also be used to check for connection with eBay server
  * before performing any action like uploading a product.
  * Should only be called once per session because eBay has a connection limit.
  *
- * @return
+ * @return object
  *   Time from eBay server in array.
  *
  * @code
@@ -226,55 +231,59 @@ function ebay_commerce_action($action , $xml = NULL) {
 function ebay_commerce_get_time() {
 
   $record = ebay_commerce_action('GeteBayOfficialTime');
+
   if ($record) {
     foreach ($record as $response) {
+      /** @var DOMElement $response */
       $variable = $response->getElementsByTagName('Timestamp');
-      $baytime = strtotime($variable->item(0)->nodeValue);
-      $baytime_formatted = format_date($baytime, 'custom', 'F j, Y - H:i');
+      $bay_time = strtotime($variable->item(0)->nodeValue);
+      $bay_time_formatted = format_date($bay_time, 'custom', 'F j, Y - H:i');
 
       $ebay_response = new stdClass();
-      $ebay_response->time_raw = $baytime;
-      $ebay_response->time_format = $baytime_formatted;
+      $ebay_response->time_raw = $bay_time;
+      $ebay_response->time_format = $bay_time_formatted;
+      return $ebay_response;
     }
-    return $ebay_response;
   }
-} // End function
-
+}
 
 /**
- * Test function for uploading a product as a fixed price item to eBay.
- * AddFixedPriceItem.
- * Used for testing and debugging.
+ * Test upload.
  *
- * See : http://developer.ebay.com/devzone/xml/docs/reference/ebay/AddFixedPriceItem.html
+ * Function for uploading a product as a fixed price item to eBay.
+ *
+ * AddFixedPriceItem. Used for testing and debugging.
+ * @link http://developer.ebay.com/devzone/xml/docs/reference/ebay/AddFixedPriceItem.html @endlink.
  */
 function ebay_commerce_test_upload() {
 
-  // Build some values for testing
-  $inventorytracking = EBAY_INVENTORY_TRACKING;
+  // Build some values for testing.
+  $inventory_tracking = EBAY_COMMERCE_INVENTORY_TRACKING;
   $sku = rand();
   $title = random_title(20);
-  $lorum =  file_get_contents('http://loripsum.net/api'); // Generate dummy from http://loripsum.net/
+  // Generate dummy from http://loripsum.net/
+  $lorum = file_get_contents('http://loripsum.net/api');
   $description = utf8_encode("<![CDATA[ " . $lorum . " ]]>");
   $ebay_category = '88433';
   $price = rand(1, 1000);
-  $image = 'http://lorempixel.com/400/200/'; //http://dummyimage.com/300.png/09f/fff
+  // http://dummyimage.com/300.png/09f/fff
+  $image = 'http://lorempixel.com/400/200/';
 
-  // Create XMl data for uplaod.
+  // Create XMl data for upload.
   $xml_body = "<Item>";
-  $xml_body .= "<InventoryTrackingMethod>$inventorytracking</InventoryTrackingMethod>";
+  $xml_body .= "<InventoryTrackingMethod>$inventory_tracking</InventoryTrackingMethod>";
   $xml_body .= "<SKU>$sku</SKU>";
   $xml_body .= "<Title>$title</Title>";
   $xml_body .= "<Description>$description</Description>";
   $xml_body .= "<PrimaryCategory><CategoryID>$ebay_category</CategoryID></PrimaryCategory>";
   $xml_body .= "<StartPrice>$price</StartPrice>";
-  $xml_body .= "<Country>" . EBAY_COUNTRY . "</Country>";
-  $xml_body .= "<Currency>" . EBAY_CURRENCY . "</Currency>";
+  $xml_body .= "<Country>" . EBAY_COMMERCE_COUNTRY . "</Country>";
+  $xml_body .= "<Currency>" . EBAY_COMMERCE_CURRENCY . "</Currency>";
   $xml_body .= "<DispatchTimeMax>1</DispatchTimeMax>";
   $xml_body .= "<ListingDuration>GTC</ListingDuration>";
   $xml_body .= "<ListingType>FixedPriceItem</ListingType>";
   $xml_body .= "<PaymentMethods>PayPal</PaymentMethods>";
-  $xml_body .= "<PayPalEmailAddress>" . EBAY_USER_PAYPAL . "</PayPalEmailAddress>";
+  $xml_body .= "<PayPalEmailAddress>" . EBAY_COMMERCE_USER_PAYPAL . "</PayPalEmailAddress>";
   $xml_body .= "<PictureDetails>";
   $xml_body .= "<PictureURL>$image</PictureURL>";
   $xml_body .= "</PictureDetails>";
@@ -297,28 +306,30 @@ function ebay_commerce_test_upload() {
   $xml_body .= "</ShippingServiceOptions>";
   $xml_body .= "</ShippingDetails>";
 
-  $xml_body .= "<Site>" . EBAY_COUNTRY . "</Site>";
+  $xml_body .= "<Site>" . EBAY_COMMERCE_COUNTRY . "</Site>";
   $xml_body .= "</Item>";
 
-  // Create and execute uplaod.
+  // Create and execute upload.
   $record = ebay_commerce_action('AddFixedPriceItem', $xml_body);
   if ($record) {
-    # code...
+    // code...
   }
   return $record;
 }
 
-
 /**
- * Generates a random title for testing only.
- * Copy code from devel generate module.
+ * Generates a random title.
+ *
+ * Used for testing only.
+ * Copy code from Devel generate module.
  */
 function random_title($length) {
-   mt_srand((double)microtime()*1000000);
+  mt_srand((double) microtime() * 1000000);
 
   $vowels = array("a", "e", "i", "o", "u");
   $cons = array("b", "c", "d", "g", "h", "j", "k", "l", "m", "n", "p", "r", "s", "t", "u", "v", "w", "tr",
-  "cr", "br", "fr", "th", "dr", "ch", "ph", "wr", "st", "sp", "sw", "pr", "sl", "cl", "sh");
+    "cr", "br", "fr", "th", "dr", "ch", "ph", "wr", "st", "sp", "sw", "pr", "sl", "cl", "sh",
+  );
 
   $num_vowels = count($vowels);
   $num_cons = count($cons);
@@ -330,6 +341,3 @@ function random_title($length) {
 
   return substr($word, 0, $length);
 }
-
-
-

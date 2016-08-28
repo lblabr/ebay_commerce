@@ -3,24 +3,26 @@
 /**
  * @file
  * Simpletest for eBay commerce module.
- * http://drupal.org/node/890654.
+ *
+ * @link http://drupal.org/node/890654 @endlink.
  */
 
 /**
+ * Simpletest.
  *
  * @see DrupalWebTestCase
  * @see SimpleTestUnitTestExampleTestCase
  *
  * @ingroup ebay_commerce
  */
-class eBayCommerceLoaderTestCase extends DrupalWebTestCase {
+class EbayCommerceLoaderTestCase extends DrupalWebTestCase {
 
   protected $privilegedUser;
 
   /**
    * Give display information to the SimpleTest system.
    *
-   * getInfo() returns a keyed array of information for SimpleTest to show.
+   * GetInfo() returns a keyed array of information for SimpleTest to show.
    *
    * It's a good idea to organize your tests consistently using the 'group'
    * key.

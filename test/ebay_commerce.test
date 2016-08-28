@@ -3,24 +3,26 @@
 /**
  * @file
  * Simpletest for eBay commerce module.
- * http://drupal.org/node/890654.
+ *
+ * @link http://drupal.org/node/890654 @endlink
  */
 
 /**
+ * Simpletest.
  *
  * @see DrupalWebTestCase
  * @see SimpleTestUnitTestExampleTestCase
  *
  * @ingroup ebay_commerce
  */
-class eBayCommerceTestCase extends DrupalWebTestCase {
+class EbayCommerceTestCase extends DrupalWebTestCase {
 
   protected $privilegedUser;
 
   /**
    * Give display information to the SimpleTest system.
    *
-   * getInfo() returns a keyed array of information for SimpleTest to show.
+   * GetInfo() returns a keyed array of information for SimpleTest to show.
    *
    * It's a good idea to organize your tests consistently using the 'group'
    * key.
@@ -51,7 +53,12 @@ class eBayCommerceTestCase extends DrupalWebTestCase {
     // Create and log in our user. The user has the arbitrary privilege
     // 'extra special edit any simpletest_example' which is provided by
     // our module to grant access.
-    $this->privilegedUser = $this->drupalCreateUser(array('administer ebay', 'end ebay items', 'post ebay items'));
+    $this->privilegedUser = $this->drupalCreateUser(
+      array(
+        'administer ebay',
+        'end ebay items',
+        'post ebay items',
+      ));
     $this->drupalLogin($this->privilegedUser);
   }
 

@@ -1,184 +1,209 @@
 <?php
+
+/**
+ * @file
+ * Install file for eBay Commerce Loader module.
+ */
+
 /**
  * Implements hook_schema().
  */
 function ebay_commerce_loader_schema() {
   $schema = array();
 
-// Sites
+  // Sites.
   $schema['ebay_commerce_sites'] = array(
-    'description' => t('The base table.'),
+    'description' => 'The base table.',
     'fields' => array(
       'ecsid' => array(
         'description' => 'The primary identifier.',
         'type' => 'serial',
         'unsigned' => TRUE,
-        'not null' => TRUE),
+        'not null' => TRUE,
+      ),
       'siteid' => array(
         'description' => 'The site id.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'default' => 0),
+        'default' => 0,
+      ),
       'site' => array(
         'description' => 'The site name.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''),
+        'default' => '',
       ),
+    ),
     'indexes' => array(
       'site' => array('site'),
-      ),
+    ),
     'unique keys' => array(
       'siteid' => array('siteid'),
-      ),
+    ),
     'primary key' => array('ecsid'),
-    );
+  );
 
-// Country
+  // Country.
   $schema['ebay_commerce_country'] = array(
-    'description' => t('The base table for country details.'),
+    'description' => 'The base table for country details.',
     'fields' => array(
       'eccid' => array(
         'description' => 'The primary identifier.',
         'type' => 'serial',
         'unsigned' => TRUE,
-        'not null' => TRUE),
+        'not null' => TRUE,
+      ),
       'country' => array(
         'description' => 'The country short code like NL.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''),
+        'default' => '',
+      ),
       'description' => array(
         'description' => 'The long name of the country.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''),
+        'default' => '',
       ),
+    ),
     'indexes' => array(
       'description' => array('description'),
-      ),
+    ),
     'unique keys' => array(
       'country' => array('country'),
-      ),
+    ),
     'primary key' => array('eccid'),
-    );
+  );
 
-// Currency
+  // Currency.
   $schema['ebay_commerce_currency'] = array(
-    'description' => t('The base table for currency details.'),
+    'description' => 'The base table for currency details.',
     'fields' => array(
       'eccuid' => array(
         'description' => 'The primary identifier.',
         'type' => 'serial',
         'unsigned' => TRUE,
-        'not null' => TRUE),
+        'not null' => TRUE,
+      ),
       'currency' => array(
         'description' => 'The currency short code like EUR.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''),
+        'default' => '',
+      ),
       'description' => array(
         'description' => 'The long name of the currency.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''),
+        'default' => '',
       ),
+    ),
     'indexes' => array(
       'description' => array('description'),
-      ),
+    ),
     'unique keys' => array(
       'currency' => array('currency'),
-      ),
+    ),
     'primary key' => array('eccuid'),
-    );
+  );
 
-// URLs
+  // URLs.
   $schema['ebay_commerce_url'] = array(
-    'description' => t('The base table for url details.'),
+    'description' => 'The base table for url details.',
     'fields' => array(
       'ecurlid' => array(
         'description' => 'The primary identifier.',
         'type' => 'serial',
         'unsigned' => TRUE,
-        'not null' => TRUE),
+        'not null' => TRUE,
+      ),
       'urltype' => array(
         'description' => 'The of URL.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''),
+        'default' => '',
+      ),
       'url' => array(
         'description' => 'The url.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''),
+        'default' => '',
       ),
+    ),
     'unique keys' => array(
       'urltype' => array('urltype'),
-      ),
+    ),
     'primary key' => array('ecurlid'),
-    );
+  );
 
-// Users
+  // Users.
   $schema['ebay_commerce_user'] = array(
-    'description' => t('The base table.'),
+    'description' => 'The base table.',
     'fields' => array(
       'ecuid' => array(
         'description' => 'The primary identifier.',
         'type' => 'serial',
         'unsigned' => TRUE,
-        'not null' => TRUE),
+        'not null' => TRUE,
+      ),
       'userid' => array(
         'description' => 'The user id.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'default' => 0),
+        'default' => 0,
+      ),
       'email' => array(
         'description' => 'The email',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''),
+        'default' => '',
+      ),
       'storeowner' => array(
         'description' => 'The site name.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''),
+        'default' => '',
+      ),
       'storeurl' => array(
         'description' => 'The site name.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''),
+        'default' => '',
+      ),
       'storesite' => array(
         'description' => 'The site name.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''),
+        'default' => '',
+      ),
       'eiastoken' => array(
         'description' => 'The site name.',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
-        'default' => ''),
+        'default' => '',
       ),
+    ),
     'indexes' => array(
       'email' => array('email'),
-      ),
+    ),
     'unique keys' => array(
       'userid' => array('userid'),
-      ),
+    ),
     'primary key' => array('ecuid'),
-    );
+  );
   return $schema;
 }
